@@ -14,6 +14,18 @@ export async function sessionRoutes(
   app: FastifyInstance,
   deps: SessionRoutesDeps,
 ): Promise<void> {
+  app.get<{ Querystring: { status?: string; date?: string } }>(
+    "/api/sessions",
+    async (request) => {
+      const { status, date } = request.query;
+      const raw = status
+        ? deps.sessionRepo.findByStatus(status)
+        : deps.sessionRepo.findByStatus("filling");
+      const sessions = date ? raw.filter((s) => s.date === date) : raw;
+      return { data: sessions };
+    },
+  );
+
   app.get<{ Params: { id: string }; Querystring: { date?: string } }>(
     "/api/courts/:id/sessions",
     async (request) => {

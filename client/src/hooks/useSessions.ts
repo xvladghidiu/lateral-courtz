@@ -1,6 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchCourtSessions, createSession, joinSession } from "../api/sessions.js";
+import { fetchAllSessions, fetchCourtSessions, createSession, joinSession } from "../api/sessions.js";
 import { useAuth } from "../context/AuthContext.js";
+
+export function useAllSessions(status?: string) {
+  return useQuery({
+    queryKey: ["sessions", "all", status],
+    queryFn: () => fetchAllSessions(status),
+  });
+}
 
 export function useCourtSessions(courtId: string, date?: string) {
   return useQuery({ queryKey: ["sessions", courtId, date], queryFn: () => fetchCourtSessions(courtId, date), enabled: !!courtId });

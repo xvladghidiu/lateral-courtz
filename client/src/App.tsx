@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./context/AuthContext.js";
+import Discover from "./pages/Discover.js";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
@@ -16,7 +17,7 @@ export default function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Placeholder name="Discover" />} />
+            <Route path="/" element={<Discover />} />
             <Route path="/map" element={<Placeholder name="Full Map" />} />
             <Route path="/courts/:id" element={<Placeholder name="Court Details" />} />
             <Route path="/sessions/new" element={<Placeholder name="Create Session" />} />

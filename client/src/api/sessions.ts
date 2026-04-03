@@ -1,6 +1,11 @@
 import { apiClient } from "./client.js";
 import type { Session, CreateSessionInput, Booking } from "@shared/types/index.js";
 
+export function fetchAllSessions(status?: string) {
+  const qs = status ? `?status=${status}` : "";
+  return apiClient<Session[]>(`/sessions${qs}`);
+}
+
 export function fetchCourtSessions(courtId: string, date?: string) {
   const qs = date ? `?date=${date}` : "";
   return apiClient<Session[]>(`/courts/${courtId}/sessions${qs}`);
