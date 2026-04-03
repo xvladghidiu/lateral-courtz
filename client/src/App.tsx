@@ -2,6 +2,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./context/AuthContext.js";
 import Discover from "./pages/Discover.js";
+import Login from "./pages/Login.js";
+import Register from "./pages/Register.js";
+import CourtDetails from "./pages/CourtDetails.js";
+import CreateSession from "./pages/CreateSession.js";
+import SessionDetails from "./pages/SessionDetails.js";
+import Checkout from "./pages/Checkout.js";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
@@ -19,12 +25,12 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Discover />} />
             <Route path="/map" element={<Placeholder name="Full Map" />} />
-            <Route path="/courts/:id" element={<Placeholder name="Court Details" />} />
-            <Route path="/sessions/new" element={<Placeholder name="Create Session" />} />
-            <Route path="/sessions/:id" element={<Placeholder name="Session Details" />} />
-            <Route path="/checkout/:sessionId" element={<Placeholder name="Checkout" />} />
-            <Route path="/login" element={<Placeholder name="Login" />} />
-            <Route path="/register" element={<Placeholder name="Register" />} />
+            <Route path="/courts/:id" element={<CourtDetails />} />
+            <Route path="/sessions/new" element={<CreateSession />} />
+            <Route path="/sessions/:id" element={<SessionDetails />} />
+            <Route path="/checkout/:sessionId" element={<Checkout />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<Placeholder name="Dashboard" />} />
           </Routes>
         </BrowserRouter>
