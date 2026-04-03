@@ -1,0 +1,73 @@
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.player-slots {
+  display: flex;
+  gap: 3px;
+  flex: 1;
+}
+
+.player-slot {
+  flex: 1;
+  border-radius: 6px;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.player-slot-md {
+  height: 28px;
+}
+
+.player-slot-sm {
+  height: 22px;
+}
+
+.slot-filled {
+  background: rgba(230, 51, 40, 0.15);
+  border: 1px solid rgba(230, 51, 40, 0.2);
+}
+
+.slot-filled.slot-orange {
+  background: rgba(232, 114, 13, 0.15);
+  border: 1px solid rgba(232, 114, 13, 0.2);
+}
+
+.slot-empty {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+}
+
+.slot-filled::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 3px;
+  background: var(--red);
+  opacity: 0.6;
+}
+
+.slot-filled.slot-orange::after {
+  background: var(--orange);
+}
+
+.player-slot-sm.slot-filled::after {
+  inset: 3px;
+  border-radius: 2px;
+}
+
+.player-count {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+  min-width: 42px;
+  text-align: right;
+}
+
+.player-count-divider {
+  color: var(--text-3);
+  font-weight: 400;
+}

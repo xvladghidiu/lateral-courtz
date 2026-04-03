@@ -1,0 +1,46 @@
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-3);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.filter-chip:hover {
+  color: var(--text-2);
+  border-color: var(--border-hover);
+}
+
+.filter-chip-active {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.filter-separator {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+.filter-count {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-3);
+  white-space: nowrap;
+}
