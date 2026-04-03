@@ -1,0 +1,7 @@
+[
+  {"id":"session-1","courtId":"court-1","createdBy":"user-1","date":"2026-04-03","startTime":"19:00","durationMinutes":120,"format":"5v5","mode":"open","maxPlayers":10,"players":["user-1","user-2","user-3"],"status":"filling","autoConfirmDeadline":"2026-04-03T17:00:00Z"},
+  {"id":"session-2","courtId":"court-1","createdBy":"user-2","date":"2026-04-03","startTime":"19:00","durationMinutes":60,"format":"3v3","mode":"open","maxPlayers":6,"players":["user-2","user-1","user-3"],"status":"filling","autoConfirmDeadline":"2026-04-03T17:00:00Z"},
+  {"id":"session-3","courtId":"court-2","createdBy":"user-3","date":"2026-04-03","startTime":"18:30","durationMinutes":90,"format":"5v5","mode":"open","maxPlayers":10,"players":["user-3"],"status":"filling","autoConfirmDeadline":"2026-04-03T16:30:00Z"},
+  {"id":"session-4","courtId":"court-4","createdBy":"user-1","date":"2026-04-03","startTime":"20:00","durationMinutes":120,"format":"5v5","mode":"private","maxPlayers":10,"players":["user-1","user-2"],"status":"filling","autoConfirmDeadline":"2026-04-03T18:00:00Z"},
+  {"id":"session-5","courtId":"court-5","createdBy":"user-2","date":"2026-04-04","startTime":"17:00","durationMinutes":60,"format":"3v3","mode":"open","maxPlayers":6,"players":["user-2"],"status":"filling","autoConfirmDeadline":"2026-04-04T15:00:00Z"}
+]

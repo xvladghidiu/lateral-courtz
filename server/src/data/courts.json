@@ -1,0 +1,8 @@
+[
+  {"id":"court-1","name":"Downtown Sports Center","address":"123 Main St","lat":40.7128,"lng":-74.006,"type":"indoor","surface":"hardwood","amenities":["lights","parking","lockers","water"],"photos":[],"pricePerPlayerPerHour":8,"rating":4.7,"reviewCount":23},
+  {"id":"court-2","name":"Riverside Courts","address":"45 River Rd","lat":40.718,"lng":-73.998,"type":"outdoor","surface":"asphalt","amenities":["lights","water"],"photos":[],"pricePerPlayerPerHour":6,"rating":4.2,"reviewCount":15},
+  {"id":"court-3","name":"Eastside Community Gym","address":"789 Oak Ave","lat":40.72,"lng":-73.985,"type":"indoor","surface":"rubber","amenities":["lockers","water","showers"],"photos":[],"pricePerPlayerPerHour":10,"rating":4.9,"reviewCount":41},
+  {"id":"court-4","name":"Park District Courts","address":"22 Park Blvd","lat":40.725,"lng":-74.015,"type":"outdoor","surface":"asphalt","amenities":[],"photos":[],"pricePerPlayerPerHour":5,"rating":3.8,"reviewCount":8},
+  {"id":"court-5","name":"West Loop Athletic Club","address":"500 W Madison St","lat":40.71,"lng":-74.02,"type":"indoor","surface":"hardwood","amenities":["lights","parking","lockers","showers","water"],"photos":[],"pricePerPlayerPerHour":12,"rating":4.5,"reviewCount":30},
+  {"id":"court-6","name":"Lakeshore Rec Center","address":"800 Lake Shore Dr","lat":40.73,"lng":-73.99,"type":"indoor","surface":"hardwood","amenities":["lights","parking","water"],"photos":[],"pricePerPlayerPerHour":7,"rating":4.3,"reviewCount":18}
+]

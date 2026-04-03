@@ -1,0 +1,12 @@
+[
+  {"id":"rev-1","courtId":"court-1","userId":"user-1","rating":5,"comment":"Best indoor court in the area. Hardwood is in great condition.","createdAt":"2026-03-01T10:00:00Z"},
+  {"id":"rev-2","courtId":"court-1","userId":"user-2","rating":4,"comment":"Great facility, parking can be tight on weekends.","createdAt":"2026-03-05T14:00:00Z"},
+  {"id":"rev-3","courtId":"court-2","userId":"user-3","rating":4,"comment":"Nice outdoor courts. Gets hot in summer but the lights are great for evening games.","createdAt":"2026-02-20T18:00:00Z"},
+  {"id":"rev-4","courtId":"court-2","userId":"user-1","rating":4,"comment":"Good asphalt surface. Bring your own water.","createdAt":"2026-03-12T09:00:00Z"},
+  {"id":"rev-5","courtId":"court-3","userId":"user-2","rating":5,"comment":"Rubber court is easy on the knees. Locker rooms are clean.","createdAt":"2026-03-15T11:00:00Z"},
+  {"id":"rev-6","courtId":"court-3","userId":"user-3","rating":5,"comment":"Top-notch community gym. Staff is friendly.","createdAt":"2026-03-18T16:00:00Z"},
+  {"id":"rev-7","courtId":"court-4","userId":"user-1","rating":4,"comment":"Basic but works. Free parking nearby.","createdAt":"2026-02-28T08:00:00Z"},
+  {"id":"rev-8","courtId":"court-4","userId":"user-2","rating":3,"comment":"Surface is a bit rough. Could use maintenance.","createdAt":"2026-03-20T19:00:00Z"},
+  {"id":"rev-9","courtId":"court-5","userId":"user-3","rating":5,"comment":"Premium facility. Worth the price.","createdAt":"2026-03-22T12:00:00Z"},
+  {"id":"rev-10","courtId":"court-6","userId":"user-1","rating":4,"comment":"Good location, nice hardwood. Gets busy on weekday evenings.","createdAt":"2026-03-25T17:00:00Z"}
+]
