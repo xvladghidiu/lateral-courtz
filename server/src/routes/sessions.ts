@@ -26,6 +26,15 @@ export async function sessionRoutes(
     },
   );
 
+  app.get<{ Params: { id: string } }>(
+    "/api/sessions/:id",
+    async (request, reply) => {
+      const session = deps.sessionRepo.findById(request.params.id);
+      if (!session) return reply.status(404).send({ error: "Session not found" });
+      return { data: session };
+    },
+  );
+
   app.get<{ Params: { id: string }; Querystring: { date?: string } }>(
     "/api/courts/:id/sessions",
     async (request) => {
