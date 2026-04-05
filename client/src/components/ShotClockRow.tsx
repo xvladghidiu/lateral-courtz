@@ -12,12 +12,17 @@ function almostFullCount(sessions: Session[]): number {
   ).length;
 }
 
+function currentlyPlaying(sessions: Session[]): number {
+  return sessions.reduce((sum, s) => sum + s.players.length, 0);
+}
+
 export default function ShotClockRow({ sessions, courts }: ShotClockRowProps) {
   return (
-    <div className="absolute top-1/2 left-5 -translate-y-1/2 z-10 flex flex-col gap-6">
+    <div className="absolute top-1/2 left-5 -translate-y-1/2 z-10 flex flex-col gap-5">
+      <ShotClock value={currentlyPlaying(sessions)} label="Playing Now" color="red" />
       <ShotClock value={sessions.length} label="Active" color="red" />
       <ShotClock value={almostFullCount(sessions)} label="Filling" color="orange" />
-      <ShotClock value={courts.length} label="Courts" color="green" />
+      <ShotClock value={courts.length} label="Nearby Courts" color="green" />
     </div>
   );
 }
