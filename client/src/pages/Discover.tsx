@@ -311,21 +311,12 @@ export default function Discover() {
       <button
         type="button"
         onClick={handleDiscover}
-        className={`group absolute top-[7.5rem] left-1/2 -translate-x-1/2 z-20 flex items-center gap-3 px-6 py-3 rounded-full backdrop-blur-[24px] backdrop-saturate-[180%] shadow-[0_8px_32px_rgba(0,0,0,0.15)] transition-all duration-300 hover:scale-105 hover:shadow-[0_12px_40px_rgba(255,59,48,0.2)] ${
-          isDark
-            ? "bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.12)] hover:border-[rgba(255,59,48,0.3)]"
-            : "bg-[rgba(255,255,255,0.2)] border border-[rgba(255,255,255,0.3)] hover:bg-[rgba(255,255,255,0.35)] hover:border-[rgba(255,59,48,0.25)]"
-        }`}
+        className="group absolute top-[7.5rem] left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 pl-4 pr-5 py-2.5 rounded-full bg-[#ff3b30] shadow-[0_4px_20px_rgba(255,59,48,0.35)] transition-all duration-300 hover:scale-105 hover:shadow-[0_6px_28px_rgba(255,59,48,0.5)] active:scale-95"
       >
-        <span className="text-[20px] group-hover:animate-bounce">🏀</span>
-        <span className={`font-['DSEG',monospace] font-bold text-[14px] tracking-[3px] ${
-          isDark
-            ? "text-[#ff3b30] [text-shadow:0_0_10px_rgba(255,59,48,0.5),0_0_24px_rgba(255,59,48,0.2)]"
-            : "text-[#ff3b30] [text-shadow:0_0_8px_rgba(255,59,48,0.4)]"
-        }`}>
-          DISCOVER
+        <span className="text-[18px] transition-transform duration-300 group-hover:rotate-[360deg]">🏀</span>
+        <span className="font-['Square_Sans_Serif_7',sans-serif] text-[13px] text-white uppercase tracking-[3px]">
+          Discover
         </span>
-        <span className="text-[14px] opacity-60 group-hover:opacity-100 transition-opacity">→</span>
       </button>
       <ShotClockRow sessions={sessions} courts={courts} />
 
