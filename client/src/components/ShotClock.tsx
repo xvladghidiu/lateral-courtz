@@ -33,7 +33,7 @@ export default function ShotClock({ value, label, color }: ShotClockProps) {
   const c = COLOR_MAP[color];
 
   return (
-    <div className="w-[120px] h-[110px] max-sm:w-[96px] max-sm:h-[90px] rounded-xl bg-[rgba(10,10,12,0.75)] backdrop-blur-[24px] backdrop-saturate-[180%] border border-[rgba(255,255,255,0.12)] shadow-[0_8px_32px_rgba(0,0,0,0.3)] flex flex-col items-center justify-center relative">
+    <div className="w-[140px] h-[110px] max-sm:w-[110px] max-sm:h-[90px] rounded-xl bg-[rgba(10,10,12,0.75)] backdrop-blur-[24px] backdrop-saturate-[180%] border border-[rgba(255,255,255,0.12)] shadow-[0_8px_32px_rgba(0,0,0,0.3)] flex flex-col items-center justify-center relative">
       {/* Top accent line */}
       <div className={`absolute top-0 left-3 right-3 h-px bg-linear-to-r ${c.accent}`} />
       {/* LED dot */}
@@ -49,7 +49,7 @@ export default function ShotClock({ value, label, color }: ShotClockProps) {
         {formatValue(value)}
       </span>
       {/* Label */}
-      <span className="font-['Square_Sans_Serif_7',sans-serif] text-[7px] max-sm:text-[5.5px] uppercase tracking-[1.5px] text-white mt-2.5 whitespace-nowrap">
+      <span className="font-['Square_Sans_Serif_7',sans-serif] text-[10px] max-sm:text-[8px] uppercase tracking-[2px] text-[rgba(255,255,255,0.7)] mt-2.5 whitespace-nowrap">
         {label}
       </span>
     </div>
