@@ -49,7 +49,7 @@ export default function ShotClock({ value, label, color }: ShotClockProps) {
         {formatValue(value)}
       </span>
       {/* Label */}
-      <span className="font-['Square_Sans_Serif_7',sans-serif] text-[8px] max-sm:text-[6px] uppercase tracking-[1.5px] text-white mt-2.5 text-center leading-tight max-w-[100px]">
+      <span className="font-['Square_Sans_Serif_7',sans-serif] text-[7px] max-sm:text-[5.5px] uppercase tracking-[1.5px] text-white mt-2.5 whitespace-nowrap">
         {label}
       </span>
     </div>
