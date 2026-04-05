@@ -311,10 +311,16 @@ export default function Discover() {
       <button
         type="button"
         onClick={handleDiscover}
-        className="group absolute top-[9rem] left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 pl-4 pr-5 py-2.5 rounded-full bg-[#ff3b30] shadow-[0_8px_24px_rgba(255,59,48,0.4),0_16px_48px_rgba(255,59,48,0.15)] animate-float transition-all duration-300 hover:scale-105 hover:shadow-[0_12px_32px_rgba(255,59,48,0.5),0_24px_60px_rgba(255,59,48,0.2)] active:scale-95"
+        className={`group absolute top-[10.5rem] left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 pl-4 pr-5 py-2.5 rounded-full backdrop-blur-[24px] backdrop-saturate-[180%] shadow-[0_8px_24px_rgba(0,0,0,0.12),0_16px_48px_rgba(0,0,0,0.06)] animate-float transition-all duration-300 hover:scale-105 hover:shadow-[0_12px_32px_rgba(0,0,0,0.18),0_24px_60px_rgba(0,0,0,0.1)] active:scale-95 ${
+          isDark
+            ? "bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.14)]"
+            : "bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.25)] hover:bg-[rgba(255,255,255,0.25)]"
+        }`}
       >
         <span className="text-[18px] transition-transform duration-300 group-hover:rotate-[360deg]">🏀</span>
-        <span className="font-['Square_Sans_Serif_7',sans-serif] text-[13px] text-white uppercase tracking-[3px]">
+        <span className={`font-['Square_Sans_Serif_7',sans-serif] text-[13px] uppercase tracking-[3px] ${
+          isDark ? "text-[rgba(255,255,255,0.8)]" : "text-[rgba(0,0,0,0.55)]"
+        }`}>
           Discover
         </span>
       </button>
