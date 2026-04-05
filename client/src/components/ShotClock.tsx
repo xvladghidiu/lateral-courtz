@@ -6,22 +6,22 @@ interface ShotClockProps {
 
 const COLOR_MAP = {
   red: {
-    text: "text-[#ff3b30]",
-    shadow: "[text-shadow:0_0_10px_rgba(255,59,48,0.5),0_0_24px_rgba(255,59,48,0.2)]",
-    led: "bg-[#ff3b30] shadow-[0_0_6px_rgba(255,59,48,0.6)]",
-    accent: "from-transparent via-[rgba(255,59,48,0.4)] to-transparent",
+    text: "text-[rgba(255,255,255,0.85)]",
+    shadow: "[text-shadow:0_0_10px_rgba(255,255,255,0.3),0_0_24px_rgba(255,255,255,0.1)]",
+    led: "bg-[rgba(255,255,255,0.6)] shadow-[0_0_6px_rgba(255,255,255,0.3)]",
+    accent: "from-transparent via-[rgba(255,255,255,0.2)] to-transparent",
   },
   orange: {
-    text: "text-[#ff9500]",
-    shadow: "[text-shadow:0_0_10px_rgba(255,149,0,0.5),0_0_24px_rgba(255,149,0,0.2)]",
-    led: "bg-[#ff9500] shadow-[0_0_6px_rgba(255,149,0,0.6)]",
-    accent: "from-transparent via-[rgba(255,149,0,0.4)] to-transparent",
+    text: "text-[rgba(255,255,255,0.65)]",
+    shadow: "[text-shadow:0_0_10px_rgba(255,255,255,0.2),0_0_24px_rgba(255,255,255,0.08)]",
+    led: "bg-[rgba(255,255,255,0.45)] shadow-[0_0_6px_rgba(255,255,255,0.2)]",
+    accent: "from-transparent via-[rgba(255,255,255,0.15)] to-transparent",
   },
   green: {
-    text: "text-[#34c759]",
-    shadow: "[text-shadow:0_0_10px_rgba(52,199,89,0.4),0_0_24px_rgba(52,199,89,0.15)]",
-    led: "bg-[#34c759] shadow-[0_0_6px_rgba(52,199,89,0.5)]",
-    accent: "from-transparent via-[rgba(52,199,89,0.35)] to-transparent",
+    text: "text-[rgba(255,255,255,0.5)]",
+    shadow: "[text-shadow:0_0_10px_rgba(255,255,255,0.15),0_0_24px_rgba(255,255,255,0.06)]",
+    led: "bg-[rgba(255,255,255,0.35)] shadow-[0_0_6px_rgba(255,255,255,0.15)]",
+    accent: "from-transparent via-[rgba(255,255,255,0.1)] to-transparent",
   },
 };
 
@@ -33,23 +33,23 @@ export default function ShotClock({ value, label, color }: ShotClockProps) {
   const c = COLOR_MAP[color];
 
   return (
-    <div className="w-[88px] h-[88px] max-sm:w-[72px] max-sm:h-[72px] rounded-xl bg-glass-dark backdrop-blur-[24px] backdrop-saturate-[180%] border border-glass-border-dark shadow-[0_8px_32px_rgba(0,0,0,0.15)] flex flex-col items-center justify-center relative">
+    <div className="w-[100px] h-[100px] max-sm:w-[80px] max-sm:h-[80px] rounded-xl bg-[rgba(10,10,12,0.75)] backdrop-blur-[24px] backdrop-saturate-[180%] border border-[rgba(255,255,255,0.12)] shadow-[0_8px_32px_rgba(0,0,0,0.3)] flex flex-col items-center justify-center relative">
       {/* Top accent line */}
       <div className={`absolute top-0 left-3 right-3 h-px bg-linear-to-r ${c.accent}`} />
       {/* LED dot */}
       <div className={`absolute top-1.5 right-1.5 w-1 h-1 rounded-full animate-led-pulse ${c.led}`} />
       {/* Ghost segments */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <span className="font-['DSEG',monospace] font-bold text-[26px] max-sm:text-[20px] tracking-[1px] text-white opacity-5">
+        <span className="font-['DSEG',monospace] font-bold text-[30px] max-sm:text-[22px] tracking-[1px] text-white opacity-5">
           88:88
         </span>
       </div>
       {/* Time value */}
-      <span className={`font-['DSEG',monospace] font-bold text-[26px] max-sm:text-[20px] tracking-[1px] leading-none relative ${c.text} ${c.shadow}`}>
+      <span className={`font-['DSEG',monospace] font-bold text-[30px] max-sm:text-[22px] tracking-[1px] leading-none relative ${c.text} ${c.shadow}`}>
         {formatTime(value)}
       </span>
       {/* Label */}
-      <span className="font-[Inter] text-[7px] font-bold uppercase tracking-[1.5px] text-text-on-dark-muted mt-1.5">
+      <span className="font-['Square_Sans_Serif_7',sans-serif] text-[9px] max-sm:text-[7px] uppercase tracking-[2px] text-white mt-2">
         {label}
       </span>
     </div>
