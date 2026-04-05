@@ -9,7 +9,6 @@ import CreateSession from "./pages/CreateSession.js";
 import SessionDetails from "./pages/SessionDetails.js";
 import Checkout from "./pages/Checkout.js";
 import Dashboard from "./pages/Dashboard.js";
-import FullMap from "./pages/FullMap.js";
 import BottomTabs from "./components/BottomTabs.js";
 
 const queryClient = new QueryClient({
@@ -23,7 +22,6 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Discover />} />
-            <Route path="/map" element={<FullMap />} />
             <Route path="/courts/:id" element={<CourtDetails />} />
             <Route path="/sessions/new" element={<CreateSession />} />
             <Route path="/sessions/:id" element={<SessionDetails />} />
