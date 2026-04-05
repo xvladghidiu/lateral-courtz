@@ -1,6 +1,13 @@
 @import "tailwindcss";
 
 @font-face {
+  font-family: "Square Sans Serif 7";
+  src: url("https://fonts.cdnfonts.com/s/28538/square_sans_serif_7.woff") format("woff");
+  font-weight: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: "DSEG";
   src: url("https://cdn.jsdelivr.net/npm/dseg@0.46.0/fonts/DSEG7-Classic/DSEG7Classic-Bold.woff2") format("woff2");
   font-weight: bold;
@@ -24,6 +31,22 @@
 }
 
 @layer base {
+  .court-tooltip {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+  .court-tooltip::before { display: none !important; }
+
+  .leaflet-container { z-index: 0 !important; }
+  .leaflet-pane { z-index: auto !important; }
+  .leaflet-tile-pane { z-index: 1 !important; }
+  .leaflet-overlay-pane { z-index: 2 !important; }
+  .leaflet-marker-pane { z-index: 3 !important; }
+  .leaflet-tooltip-pane { z-index: 4 !important; }
+  .leaflet-popup-pane { z-index: 5 !important; }
+
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
@@ -89,4 +112,9 @@
 @keyframes led-pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
+}
+
+@keyframes user-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(74, 144, 217, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(74, 144, 217, 0); }
 }
