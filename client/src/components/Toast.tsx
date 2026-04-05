@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import "./Toast.css";
 
 type ToastType = "error" | "success";
 
@@ -15,7 +14,7 @@ function DismissButton({ onDismiss }: { onDismiss: () => void }) {
   return (
     <button
       type="button"
-      className="toast-dismiss"
+      className="ml-auto w-5 h-5 rounded-md flex items-center justify-center text-text-muted shrink-0 transition-colors duration-200 hover:text-text-secondary"
       onClick={onDismiss}
       aria-label="Dismiss"
     >
@@ -30,11 +29,13 @@ export default function Toast({ message, type, onDismiss }: ToastProps) {
     return () => clearTimeout(timer);
   }, [onDismiss]);
 
-  const typeClass = type === "error" ? "toast-error" : "toast-success";
+  const borderColor = type === "error"
+    ? "border-[rgba(230,51,40,0.3)]"
+    : "border-[rgba(29,185,84,0.3)]";
 
   return (
-    <div className="toast-container">
-      <div className={`toast ${typeClass}`}>
+    <div className="fixed bottom-6 right-6 z-200 max-sm:bottom-auto max-sm:top-4 max-sm:right-4 max-sm:left-4">
+      <div className={`flex items-center gap-2.5 px-4 py-3 bg-[rgba(12,12,14,0.85)] backdrop-blur-[24px] rounded-xl border text-[13px] font-medium text-text-primary min-w-[260px] animate-toast-in ${borderColor}`}>
         {message}
         <DismissButton onDismiss={onDismiss} />
       </div>

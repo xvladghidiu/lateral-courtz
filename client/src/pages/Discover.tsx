@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Court, Session } from "@shared/types/index.js";
 import { useCourts } from "../hooks/useCourts.js";
@@ -12,6 +11,7 @@ import StatCard from "../components/StatCard.js";
 import LiveGameCard from "../components/LiveGameCard.js";
 import CourtCard from "../components/CourtCard.js";
 import { SkeletonCard, SkeletonCourtCard, SkeletonStat } from "../components/Skeleton.js";
+import { mapCenter, priceIcon } from "../lib/mapUtils.js";
 
 /* ── helpers ──────────────────────────────────────────────── */
 
@@ -34,33 +34,6 @@ function cheapestPrice(courts: Court[]): number {
 
 function almostFullCount(sessions: Session[]): number {
   return sessions.filter((s) => s.maxPlayers - s.players.length <= 2).length;
-}
-
-function mapCenter(courts: Court[]): [number, number] {
-  if (!courts.length) return [40.73, -73.99];
-  const lat = courts.reduce((sum, c) => sum + c.lat, 0) / courts.length;
-  const lng = courts.reduce((sum, c) => sum + c.lng, 0) / courts.length;
-  return [lat, lng];
-}
-
-const priceIconCache = new Map<number, L.DivIcon>();
-
-function priceIcon(price: number): L.DivIcon {
-  const cached = priceIconCache.get(price);
-  if (cached) return cached;
-  const icon = L.divIcon({
-    className: "",
-    iconSize: [0, 0],
-    iconAnchor: [20, 48],
-    html: `
-      <div style="display:flex;flex-direction:column;align-items:center;cursor:pointer">
-        <div style="font-size:12px;font-weight:600;padding:5px 11px;background:rgba(16,16,20,0.8);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.05);border-radius:9px;box-shadow:0 4px 16px rgba(0,0,0,0.5);color:#f0f0f0">$${price}</div>
-        <div style="width:1px;height:12px;background:linear-gradient(to bottom,#404048,transparent);margin:0 auto"></div>
-        <div style="width:5px;height:5px;border-radius:50%;background:#e63328;box-shadow:0 0 8px rgba(230,51,40,0.4)"></div>
-      </div>`,
-  });
-  priceIconCache.set(price, icon);
-  return icon;
 }
 
 /* ── sub-components ───────────────────────────────────────── */
@@ -130,7 +103,7 @@ function HeroMap({ courts, gameCount }: { courts: Court[]; gameCount: number }) 
   const center = useMemo(() => mapCenter(courts), [courts]);
 
   return (
-    <div className="relative h-[340px] overflow-hidden bg-[#06080c]">
+    <div className="relative h-[220px] sm:h-[280px] lg:h-[340px] overflow-hidden bg-[#06080c]">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_40%,rgba(230,51,40,0.06)_0%,transparent_60%),radial-gradient(ellipse_at_70%_60%,rgba(232,114,13,0.04)_0%,transparent_50%)]" />
       <MapLayer center={center} courts={courts} />
       <div className="absolute bottom-0 left-0 right-0 h-[120px] bg-linear-to-t from-bg to-transparent z-[2]" />
@@ -174,14 +147,14 @@ function StatsRow({
 }) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-4 gap-3 mt-10">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-10">
         {Array.from({ length: 4 }, (_, i) => <SkeletonStat key={i} />)}
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-4 gap-3 mt-10">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-10">
       <StatCard value={sessions.length} label="Live games right now" icon="&#9889;" color="red" />
       <StatCard value={almostFullCount(sessions)} label="Almost full \u2014 hurry" icon="&#128293;" color="orange" />
       <StatCard value={courts.length} label="Courts near you" icon="&#128205;" color="green" />
@@ -236,7 +209,7 @@ function OpenGamesSection({ sessions, courtsById, isLoading }: { sessions: Sessi
 
 function CourtsList({ courts, sessionCounts }: { courts: Court[]; sessionCounts: Map<string, number> }) {
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
       {courts.map((c) => (
         <Link key={c.id} to={`/courts/${c.id}`}>
           <CourtCard court={c} sessionCount={sessionCounts.get(c.id) ?? 0} />
@@ -248,7 +221,7 @@ function CourtsList({ courts, sessionCounts }: { courts: Court[]; sessionCounts:
 
 function CourtsGrid({ courts, sessionCounts, isLoading }: { courts: Court[]; sessionCounts: Map<string, number>; isLoading: boolean }) {
   const skeletons = (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
       {Array.from({ length: 6 }, (_, i) => <SkeletonCourtCard key={i} />)}
     </div>
   );
@@ -279,7 +252,7 @@ export default function Discover() {
     <div className="min-h-screen">
       <Header user={user} onLogout={logout} />
       <HeroMap courts={courts} gameCount={sessions.length} />
-      <div className="max-w-[1320px] mx-auto px-8">
+      <div className="max-w-[1320px] mx-auto px-4 sm:px-8">
         <StatsRow courts={courts} sessions={sessions} isLoading={isLoading} />
         <OpenGamesSection sessions={sessions} courtsById={courtsById} isLoading={isLoading} />
         <CourtsGrid courts={courts} sessionCounts={sessionCounts} isLoading={isLoading} />

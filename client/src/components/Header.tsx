@@ -1,6 +1,5 @@
 import { NavLink } from "react-router-dom";
 import type { PublicUser } from "@shared/types/index.js";
-import "./Header.css";
 
 interface HeaderProps {
   user: PublicUser | null;
@@ -15,8 +14,8 @@ const NAV_ITEMS = [
 
 function BrandSection() {
   return (
-    <div className="brand">
-      <div className="brand-dot" />
+    <div className="flex items-center gap-2.5 text-[15px] font-semibold tracking-[-0.3px]">
+      <div className="w-[7px] h-[7px] rounded-full bg-accent-red shadow-[0_0_10px_rgba(230,51,40,0.5)] animate-breathe" />
       Lateral Courts
     </div>
   );
@@ -24,14 +23,18 @@ function BrandSection() {
 
 function NavCenter() {
   return (
-    <nav className="nav-center">
+    <nav className="hidden sm:flex absolute left-1/2 -translate-x-1/2 gap-px bg-[rgba(255,255,255,0.02)] rounded-[10px] p-[3px] border border-border">
       {NAV_ITEMS.map((item) => (
         <NavLink
           key={item.to}
           to={item.to}
           end={item.to === "/"}
           className={({ isActive }) =>
-            `nav-item${isActive ? " active" : ""}`
+            `px-[18px] py-[5px] text-[12.5px] font-medium rounded-[7px] transition-all duration-200 no-underline ${
+              isActive
+                ? "text-text-primary bg-[rgba(255,255,255,0.05)] shadow-[0_1px_3px_rgba(0,0,0,0.3)]"
+                : "text-text-muted hover:text-text-secondary"
+            }`
           }
         >
           {item.label}
@@ -43,8 +46,13 @@ function NavCenter() {
 
 function NotificationButton() {
   return (
-    <button className="h-btn" type="button" aria-label="Notifications">
+    <button
+      className="w-8 h-8 rounded-[9px] flex items-center justify-center text-text-muted transition-all duration-200 hover:bg-[rgba(255,255,255,0.03)] hover:text-text-secondary"
+      type="button"
+      aria-label="Notifications"
+    >
       <svg
+        className="w-[15px] h-[15px]"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -59,15 +67,19 @@ function NotificationButton() {
 
 function UserAvatar({ name }: { name: string }) {
   const initial = name.charAt(0).toUpperCase();
-  return <div className="h-avatar">{initial}</div>;
+  return (
+    <div className="w-7 h-7 rounded-full bg-linear-to-br from-accent-red to-accent-orange flex items-center justify-center text-[10px] font-semibold ml-1.5">
+      {initial}
+    </div>
+  );
 }
 
 export default function Header({ user, onLogout }: HeaderProps) {
   return (
-    <header className="header">
+    <header className="flex items-center justify-between px-7 h-[54px] bg-[rgba(5,5,5,0.7)] backdrop-blur-[40px] border-b border-border sticky top-0 z-100">
       <BrandSection />
       <NavCenter />
-      <div className="h-right">
+      <div className="flex items-center gap-1">
         <NotificationButton />
         {user && (
           <button type="button" onClick={onLogout} aria-label="User menu">

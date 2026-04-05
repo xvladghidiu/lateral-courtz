@@ -153,7 +153,7 @@ function SessionsSection({ courtId, sessions }: { courtId: string; sessions: Ses
   return (
     <section className="mb-10">
       <h2 className="text-xl font-semibold tracking-tight mb-4">Sessions</h2>
-      <div className="flex items-center gap-4 mb-4 flex-wrap">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4 flex-wrap">
         <DatePicker value={date} onChange={setDate} />
         <SessionCTAs courtId={courtId} />
       </div>
@@ -256,7 +256,7 @@ export default function CourtDetails() {
     return (
       <div className="min-h-screen">
         <Header user={user} onLogout={logout} />
-        <div className="max-w-[900px] mx-auto px-8 py-10 text-text-muted">Loading court...</div>
+        <div className="max-w-[900px] mx-auto px-4 sm:px-8 py-10 text-text-muted">Loading court...</div>
       </div>
     );
   }
@@ -265,7 +265,7 @@ export default function CourtDetails() {
     return (
       <div className="min-h-screen">
         <Header user={user} onLogout={logout} />
-        <div className="max-w-[900px] mx-auto px-8 py-10 text-text-muted">Court not found</div>
+        <div className="max-w-[900px] mx-auto px-4 sm:px-8 py-10 text-text-muted">Court not found</div>
       </div>
     );
   }
@@ -273,7 +273,7 @@ export default function CourtDetails() {
   return (
     <div className="min-h-screen">
       <Header user={user} onLogout={logout} />
-      <div className="max-w-[900px] mx-auto px-8 py-10">
+      <div className="max-w-[900px] mx-auto px-4 sm:px-8 py-10">
         <CourtHeader court={court} />
         <SessionsSection courtId={court.id} sessions={sessions} />
         <ReviewsSection courtId={court.id} reviews={reviews} />

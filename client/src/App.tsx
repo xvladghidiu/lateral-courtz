@@ -8,14 +8,13 @@ import CourtDetails from "./pages/CourtDetails.js";
 import CreateSession from "./pages/CreateSession.js";
 import SessionDetails from "./pages/SessionDetails.js";
 import Checkout from "./pages/Checkout.js";
+import Dashboard from "./pages/Dashboard.js";
+import FullMap from "./pages/FullMap.js";
+import BottomTabs from "./components/BottomTabs.js";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
 });
-
-function Placeholder({ name }: { name: string }) {
-  return <div style={{ padding: 40, color: "var(--text-2)" }}>{name} — coming soon</div>;
-}
 
 export default function App() {
   return (
@@ -24,15 +23,16 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Discover />} />
-            <Route path="/map" element={<Placeholder name="Full Map" />} />
+            <Route path="/map" element={<FullMap />} />
             <Route path="/courts/:id" element={<CourtDetails />} />
             <Route path="/sessions/new" element={<CreateSession />} />
             <Route path="/sessions/:id" element={<SessionDetails />} />
             <Route path="/checkout/:sessionId" element={<Checkout />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<Placeholder name="Dashboard" />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Routes>
+          <BottomTabs />
         </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>

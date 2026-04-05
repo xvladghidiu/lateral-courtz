@@ -7,7 +7,7 @@ interface ReviewCardProps {
 
 function StarRating({ rating }: { rating: number }) {
   return (
-    <span style={{ color: "var(--amber)", fontWeight: 600, fontSize: 13 }}>
+    <span className="text-accent-amber font-semibold text-[13px]">
       {Array.from({ length: 5 }, (_, i) =>
         i < rating ? "\u2605" : "\u2606"
       ).join("")}
@@ -21,27 +21,18 @@ function ReviewDate({ isoDate }: { isoDate: string }) {
     day: "numeric",
     year: "numeric",
   });
-  return (
-    <span style={{ fontSize: 11, color: "var(--text-3)" }}>{formatted}</span>
-  );
+  return <span className="text-[11px] text-text-muted">{formatted}</span>;
 }
 
 export default function ReviewCard({ review, userName }: ReviewCardProps) {
   return (
-    <div style={{ padding: "14px 0", borderBottom: "1px solid var(--border)" }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-          marginBottom: 6,
-        }}
-      >
+    <div className="py-3.5 border-b border-border">
+      <div className="flex items-center gap-2.5 mb-1.5">
         <StarRating rating={review.rating} />
-        <span style={{ fontSize: 13, fontWeight: 600 }}>{userName}</span>
+        <span className="text-[13px] font-semibold">{userName}</span>
         <ReviewDate isoDate={review.createdAt} />
       </div>
-      <p style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.5 }}>
+      <p className="text-[13px] text-text-secondary leading-normal">
         {review.comment}
       </p>
     </div>

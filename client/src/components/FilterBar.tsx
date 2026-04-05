@@ -1,5 +1,3 @@
-import "./FilterBar.css";
-
 interface FilterItem {
   id: string;
   label: string;
@@ -22,11 +20,14 @@ function FilterChip({
   isActive: boolean;
   onToggle: (id: string) => void;
 }) {
-  const activeClass = isActive ? " filter-chip-active" : "";
   return (
     <button
       type="button"
-      className={`filter-chip${activeClass}`}
+      className={`px-3.5 py-[5px] text-xs font-medium rounded-full border transition-all duration-200 whitespace-nowrap ${
+        isActive
+          ? "text-text-primary bg-[rgba(255,255,255,0.05)] border-border-hover"
+          : "text-text-muted border-border bg-transparent hover:text-text-secondary hover:border-border-hover"
+      }`}
       onClick={() => onToggle(filter.id)}
     >
       {filter.label}
@@ -42,7 +43,7 @@ export default function FilterBar({
   separatorAfter = [],
 }: FilterBarProps) {
   return (
-    <div className="filter-bar">
+    <div className="flex items-center gap-1.5 flex-wrap">
       {filters.map((filter, index) => (
         <FilterBarItem
           key={filter.id}
@@ -53,7 +54,9 @@ export default function FilterBar({
         />
       ))}
       {count !== undefined && (
-        <span className="filter-count">{count} courts</span>
+        <span className="ml-auto text-xs font-medium text-text-muted whitespace-nowrap">
+          {count} courts
+        </span>
       )}
     </div>
   );
@@ -73,7 +76,7 @@ function FilterBarItem({
   return (
     <>
       <FilterChip filter={filter} isActive={isActive} onToggle={onToggle} />
-      {showSeparator && <div className="filter-separator" />}
+      {showSeparator && <div className="w-px h-[18px] bg-border mx-1 shrink-0" />}
     </>
   );
 }
