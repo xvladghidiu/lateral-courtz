@@ -8,24 +8,31 @@ export function mapCenter(courts: Court[]): [number, number] {
   return [lat, lng];
 }
 
-const priceIconCache = new Map<number, L.DivIcon>();
+const courtIconCache = new Map<string, L.DivIcon>();
 
-export function priceIcon(price: number): L.DivIcon {
-  const cached = priceIconCache.get(price);
+export function courtIcon(id: string, name: string, price: number, rating: number): L.DivIcon {
+  const cached = courtIconCache.get(id);
   if (cached) return cached;
+  const shortName = name.length > 14 ? name.slice(0, 12) + "…" : name;
   const icon = L.divIcon({
     className: "",
     iconSize: [0, 0],
-    iconAnchor: [28, 80],
+    iconAnchor: [80, 52],
     html: `
-      <div style="display:flex;flex-direction:column;align-items:center;cursor:pointer">
-        <div style="width:68px;height:68px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,0.25);border:3px solid rgba(255,255,255,0.95)">
-          <img src="/assets/basketball-pin.png" alt="" style="width:46px;height:46px;border-radius:50%;image-rendering:pixelated" />
+      <div style="display:flex;align-items:center;gap:10px;cursor:pointer;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.4))">
+        <div style="width:44px;height:44px;border-radius:50%;background:rgba(12,12,14,0.9);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.12);flex-shrink:0">
+          <img src="/assets/basketball-pin.png" alt="" style="width:28px;height:28px;border-radius:50%;image-rendering:pixelated" />
         </div>
-        <div style="margin-top:4px;font-size:15px;font-weight:800;padding:5px 14px;background:white;border-radius:10px;box-shadow:0 3px 12px rgba(0,0,0,0.15);color:#111;letter-spacing:-0.3px;font-family:Inter,sans-serif">$${price}</div>
+        <div style="background:rgba(12,12,14,0.9);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:8px 14px;font-family:'Space Grotesk',sans-serif;min-width:100px">
+          <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.85);letter-spacing:0.3px;white-space:nowrap;margin-bottom:4px">${shortName}</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-family:'DSEG',monospace;font-size:16px;font-weight:700;color:rgba(255,255,255,0.9)">$${price}</span>
+            <span style="font-size:11px;color:#d4a012;font-weight:600">★ ${rating}</span>
+          </div>
+        </div>
       </div>`,
   });
-  priceIconCache.set(price, icon);
+  courtIconCache.set(id, icon);
   return icon;
 }
 
@@ -116,8 +123,17 @@ export function findNearestClusterBounds(
 export function userLocationIcon(): L.DivIcon {
   return L.divIcon({
     className: "",
-    iconSize: [18, 18],
-    iconAnchor: [9, 9],
-    html: `<div style="width:18px;height:18px;border-radius:50%;background:#4A90D9;border:3px solid white;box-shadow:0 0 8px rgba(74,144,217,0.6);animation:user-pulse 2s ease infinite"></div>`,
+    iconSize: [0, 0],
+    iconAnchor: [70, 52],
+    html: `
+      <div style="display:flex;align-items:center;gap:10px;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.4))">
+        <div style="width:44px;height:44px;border-radius:50%;background:rgba(12,12,14,0.9);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;border:2px solid rgba(74,144,217,0.4);flex-shrink:0;position:relative">
+          <div style="width:14px;height:14px;border-radius:50%;background:#4A90D9;box-shadow:0 0 12px rgba(74,144,217,0.6);animation:user-pulse 2s ease infinite"></div>
+        </div>
+        <div style="background:rgba(12,12,14,0.9);backdrop-filter:blur(16px);border:1px solid rgba(74,144,217,0.2);border-radius:14px;padding:8px 14px;font-family:'Space Grotesk',sans-serif">
+          <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.85);letter-spacing:0.3px;white-space:nowrap">You are here</div>
+          <div style="font-size:9px;color:rgba(74,144,217,0.7);letter-spacing:1px;text-transform:uppercase;margin-top:2px">📍 Current location</div>
+        </div>
+      </div>`,
   });
 }

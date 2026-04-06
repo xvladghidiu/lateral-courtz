@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import L from "leaflet";
 import { MapContainer, TileLayer, Marker, Tooltip, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -8,8 +9,7 @@ import { useAllSessions } from "../hooks/useSessions.js";
 import { useAuth } from "../context/AuthContext.js";
 import Header from "../components/Header.js";
 import ShotClockRow from "../components/ShotClockRow.js";
-import SidePanel from "../components/SidePanel.js";
-import { mapCenter, priceIcon, getUserLocation, findNearestClusterBounds, userLocationIcon } from "../lib/mapUtils.js";
+import { mapCenter, courtIcon, getUserLocation, findNearestClusterBounds, userLocationIcon } from "../lib/mapUtils.js";
 
 const TILE_STYLES = {
   dark: { url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", label: "Dark" },
@@ -39,7 +39,7 @@ function SearchBar({ onNavigate, dark }: { onNavigate: (lat: number, lng: number
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   function handleInput(value: string) {
     setQuery(value);
@@ -49,74 +49,47 @@ function SearchBar({ onNavigate, dark }: { onNavigate: (lat: number, lng: number
       setIsOpen(false);
       return;
     }
-    debounceRef.current = setTimeout(() => searchNominatim(value), 400);
-  }
-
-  async function searchNominatim(q: string) {
-    const params = new URLSearchParams({ q, format: "json", limit: "5" });
-    const res = await fetch(`${NOMINATIM_URL}?${params}`);
-    const data: SearchResult[] = await res.json();
-    setResults(data);
-    setIsOpen(data.length > 0);
+    debounceRef.current = setTimeout(async () => {
+      const params = new URLSearchParams({ q: value, format: "json", limit: "5" });
+      const res = await fetch(`${NOMINATIM_URL}?${params}`);
+      const data: SearchResult[] = await res.json();
+      setResults(data);
+      setIsOpen(data.length > 0);
+    }, 350);
   }
 
   function selectResult(result: SearchResult) {
-    onNavigate(parseFloat(result.lat), parseFloat(result.lon));
-    setQuery(result.display_name.split(",")[0] ?? "");
+    setQuery(result.display_name);
     setIsOpen(false);
-    setResults([]);
+    onNavigate(parseFloat(result.lat), parseFloat(result.lon));
   }
 
   return (
-    <div className="absolute top-20 left-1/2 -translate-x-1/2 z-20 w-[95%] max-w-[720px]">
-      <div className={`flex items-center gap-3 px-6 py-4 backdrop-blur-[24px] backdrop-saturate-[180%] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.06)] ${
+    <div className="absolute top-20 left-1/2 -translate-x-1/2 z-[5] w-[95%] max-w-[720px]">
+      <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl backdrop-blur-[24px] backdrop-saturate-[180%] shadow-[0_8px_32px_rgba(0,0,0,0.3)] ${
         dark
           ? "bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.12)]"
           : "bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.25)]"
       }`}>
-        <svg
-          className={`w-5 h-5 shrink-0 ${dark ? "text-[rgba(255,255,255,0.4)]" : "text-[rgba(0,0,0,0.35)]"}`}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-        >
-          <circle cx="11" cy="11" r="8" />
-          <path d="m21 21-4.35-4.35" />
-        </svg>
+        <span className={`text-lg ${dark ? "text-[rgba(255,255,255,0.3)]" : "text-[rgba(0,0,0,0.3)]"}`}>⌕</span>
         <input
           type="text"
           value={query}
           onChange={(e) => handleInput(e.target.value)}
-          onFocus={() => results.length > 0 && setIsOpen(true)}
           placeholder="Search address or neighborhood..."
-          className={`flex-1 text-[15px] bg-transparent outline-none ${
-            dark
-              ? "text-white placeholder:text-[rgba(255,255,255,0.35)]"
-              : "text-[rgba(0,0,0,0.7)] placeholder:text-[rgba(0,0,0,0.35)]"
+          className={`flex-1 bg-transparent text-[15px] focus:outline-none placeholder:opacity-40 ${
+            dark ? "text-white placeholder:text-white" : "text-black placeholder:text-black"
           }`}
         />
-        {query && (
-          <button
-            type="button"
-            onClick={() => { setQuery(""); setResults([]); setIsOpen(false); }}
-            className={`transition-colors ${dark ? "text-[rgba(255,255,255,0.35)] hover:text-white" : "text-[rgba(0,0,0,0.35)] hover:text-[rgba(0,0,0,0.6)]"}`}
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </button>
-        )}
       </div>
-
       {isOpen && (
-        <div className="mt-2 bg-[rgba(255,255,255,0.92)] backdrop-blur-[24px] border border-[rgba(0,0,0,0.08)] rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] overflow-hidden">
+        <div className="mt-2 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.1)] bg-[rgba(10,10,12,0.95)] backdrop-blur-[24px]">
           {results.map((r, i) => (
             <button
               key={i}
               type="button"
               onClick={() => selectResult(r)}
-              className="w-full text-left px-5 py-3 text-[13px] text-[rgba(0,0,0,0.65)] hover:bg-[rgba(0,0,0,0.04)] transition-colors border-b border-[rgba(0,0,0,0.04)] last:border-b-0 truncate"
+              className="w-full text-left px-5 py-3 text-[13px] text-[rgba(255,255,255,0.7)] hover:bg-[rgba(255,255,255,0.08)] border-b border-[rgba(255,255,255,0.06)] last:border-b-0 transition-colors"
             >
               {r.display_name}
             </button>
@@ -129,18 +102,54 @@ function SearchBar({ onNavigate, dark }: { onNavigate: (lat: number, lng: number
 
 /* ── Map helpers ─────────────────────────────────────── */
 
-function CourtMarker({
-  court,
-  onClick,
-}: {
-  court: Court;
-  onClick: (court: Court) => void;
-}) {
+function CourtTooltipCard({ court }: { court: Court }) {
+  return (
+    <div style={{ width: 640, borderRadius: 24, overflow: "hidden", background: "rgba(12,12,14,0.94)", backdropFilter: "blur(32px)", boxShadow: "0 20px 64px rgba(0,0,0,0.6)", fontFamily: "'Space Grotesk', sans-serif", border: "1px solid rgba(255,255,255,0.1)" }}>
+      <div style={{ position: "relative", height: 280, overflow: "hidden", margin: 0, padding: 0, lineHeight: 0, background: "#333" }}>
+        <img src="/assets/basketball-pin.png" alt="" style={{ width: "130%", height: "130%", objectFit: "cover", display: "block", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", imageRendering: "pixelated" as any }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(12,12,14,0.95) 0%, rgba(12,12,14,0.3) 40%, transparent 70%)" }} />
+        <div style={{ position: "absolute", top: 14, left: 16, fontSize: 13, fontWeight: 600, color: "#d4a012", background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)", padding: "5px 12px", borderRadius: 10, display: "flex", alignItems: "center", gap: 5 }}>
+          ★ {court.rating} <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>({court.reviewCount})</span>
+        </div>
+        <div style={{ position: "absolute", bottom: 18, left: 24, right: 24, fontSize: 18, fontWeight: 700, color: "white", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Lixdu', sans-serif", lineHeight: 1.3 }}>
+          {court.name}
+        </div>
+      </div>
+      <div style={{ padding: "22px 24px 24px" }}>
+        <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+          {[court.type, court.surface].map((label) => (
+            <span key={label} style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: "2px", color: "rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: "6px 14px" }}>
+              {label}
+            </span>
+          ))}
+        </div>
+        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.35)", marginBottom: 10 }}>{court.address}</div>
+        {court.amenities.length > 0 && (
+          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.25)", marginBottom: 16 }}>
+            {court.amenities.join(" · ")}
+          </div>
+        )}
+        <div>
+          <span style={{ fontFamily: "'DSEG', monospace", fontSize: 34, color: "rgba(255,255,255,0.9)" }}>${court.pricePerPlayerPerHour}</span>
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", marginLeft: 6 }}>/ hr</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CourtMarker({ court }: { court: Court }) {
+  const navigate = useNavigate();
+
+  const eventHandlers = useMemo(() => ({
+    click: () => navigate(`/courts/${court.id}`),
+  }), [court.id, navigate]);
+
   return (
     <Marker
       position={[court.lat, court.lng]}
-      icon={priceIcon(court.pricePerPlayerPerHour)}
-      eventHandlers={{ click: () => onClick(court) }}
+      icon={courtIcon(court.id, court.name, court.pricePerPlayerPerHour, court.rating)}
+      eventHandlers={eventHandlers}
     >
       <Tooltip
         direction="top"
@@ -148,35 +157,24 @@ function CourtMarker({
         opacity={1}
         className="court-tooltip"
       >
-        <div style={{ width: 280, borderRadius: 16, overflow: "hidden", background: "#fff", boxShadow: "0 8px 32px rgba(0,0,0,0.25)", fontFamily: "Inter, sans-serif" }}>
-          <div style={{ position: "relative", height: 140, overflow: "hidden", margin: 0, padding: 0, lineHeight: 0, background: "#888" }}>
-            <img src="/assets/basketball-pin.png" alt="" style={{ width: "130%", height: "130%", objectFit: "cover", display: "block", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", imageRendering: "pixelated" as any }} />
-            <div style={{ position: "absolute", top: 8, right: 8, fontSize: 11, fontWeight: 700, color: "#f59e0b", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", padding: "3px 10px", borderRadius: 8 }}>
-              ★ {court.rating}
-            </div>
-          </div>
-          <div style={{ padding: "12px 14px" }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "#111", letterSpacing: "-0.3px" }}>{court.name}</div>
-            <div style={{ fontSize: 11, color: "#888", marginTop: 2 }}>
-              {court.type} · {court.surface} · {court.address}
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-              <span style={{ fontSize: 16, fontWeight: 800, color: "#111" }}>${court.pricePerPlayerPerHour}<span style={{ fontSize: 11, fontWeight: 400, color: "#999" }}>/hr</span></span>
-              <span style={{ fontSize: 11, fontWeight: 600, color: "#ff3b30", cursor: "pointer" }}>View Details →</span>
-            </div>
-          </div>
-        </div>
+        <CourtTooltipCard court={court} />
       </Tooltip>
     </Marker>
   );
 }
 
-function MapResizer({ panelOpen }: { panelOpen: boolean }) {
+function TooltipListener({ onChange }: { onChange: (open: boolean) => void }) {
   const map = useMap();
   useEffect(() => {
-    const timer = setTimeout(() => map.invalidateSize(), 350);
-    return () => clearTimeout(timer);
-  }, [panelOpen, map]);
+    const onOpen = () => onChange(true);
+    const onClose = () => onChange(false);
+    map.on("tooltipopen", onOpen);
+    map.on("tooltipclose", onClose);
+    return () => {
+      map.off("tooltipopen", onOpen);
+      map.off("tooltipclose", onClose);
+    };
+  }, [map, onChange]);
   return null;
 }
 
@@ -196,17 +194,6 @@ function MapRef({ onMap }: { onMap: (map: L.Map) => void }) {
 
 /* ── Tile style switcher ─────────────────────────────── */
 
-function TileUpdater({ url }: { url: string }) {
-  const map = useMap();
-  useEffect(() => {
-    map.eachLayer((layer) => {
-      if ((layer as any)._url) map.removeLayer(layer);
-    });
-    new (L as any).TileLayer(url).addTo(map);
-  }, [url, map]);
-  return null;
-}
-
 function MapStyleSwitcher({
   active,
   onChange,
@@ -215,7 +202,7 @@ function MapStyleSwitcher({
   onChange: (style: TileStyle) => void;
 }) {
   return (
-    <div className="absolute bottom-6 left-5 z-20 flex gap-1.5">
+    <div className="absolute bottom-6 left-5 z-[5] flex gap-1.5">
       {(Object.keys(TILE_STYLES) as TileStyle[]).map((key) => (
         <button
           key={key}
@@ -240,11 +227,13 @@ export default function Discover() {
   const { data: courts = EMPTY_COURTS } = useCourts();
   const { data: sessions = [] } = useAllSessions("filling");
   const { user, logout } = useAuth();
-  const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
+  const location = useLocation();
   const [flyTarget, setFlyTarget] = useState<[number, number] | null>(null);
   const [tileStyle, setTileStyle] = useState<TileStyle>("dark");
+  const [tooltipOpen, setTooltipOpen] = useState(false);
 
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [geoReady, setGeoReady] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
   const handleMapRef = useCallback((map: L.Map) => { mapRef.current = map; }, []);
 
@@ -252,19 +241,16 @@ export default function Discover() {
     getUserLocation()
       .then((pos) => {
         setUserLocation(pos);
-        mapRef.current?.flyTo(pos, 13, { duration: 1.5 });
+        setGeoReady(true);
       })
-      .catch(() => {});
+      .catch(() => {
+        setGeoReady(true);
+      });
   }, []);
 
-  const center = useMemo(() => mapCenter(courts), [courts]);
-  const isDark = useMemo(() => isDarkTile(tileStyle), [tileStyle]);
+  const center = useMemo(() => userLocation ?? mapCenter(courts), [userLocation, courts]);
+  const isDark = isDarkTile(tileStyle);
   const userIcon = useMemo(() => userLocationIcon(), []);
-  const handlePinClick = useCallback(
-    (court: Court) => setSelectedCourt(court),
-    [],
-  );
-  const handleClosePanel = useCallback(() => setSelectedCourt(null), []);
   const handleNavigate = useCallback(
     (lat: number, lng: number) => setFlyTarget([lat, lng]),
     [],
@@ -275,30 +261,32 @@ export default function Discover() {
     mapRef.current?.flyToBounds(bounds, { padding: [50, 50], duration: 1.5 });
   }, [userLocation, center, courts]);
 
+  // Always mounted — hide when not on home route
+  const isVisible = location.pathname === "/";
+
+  if (!geoReady) {
+    return (
+      <div className="relative w-screen h-screen overflow-hidden bg-[#1a1a1e]" style={{ display: isVisible ? undefined : "none" }} />
+    );
+  }
+
   return (
-    <div className="relative w-screen h-screen overflow-hidden">
-      <div
-        className={`absolute inset-0 z-0 transition-all duration-300 ${selectedCourt ? "sm:right-[400px]" : ""}`}
-      >
+    <div className="relative w-screen h-screen overflow-hidden" style={{ display: isVisible ? undefined : "none" }}>
+      <div className="absolute inset-0">
         <MapContainer
           center={center}
-          zoom={15}
+          zoom={userLocation ? 14 : 15}
           zoomControl={false}
           attributionControl={false}
           className="w-full h-full"
           style={{ height: "100%", width: "100%" }}
         >
-          <TileLayer url={TILE_STYLES[tileStyle].url} />
-          <TileUpdater url={TILE_STYLES[tileStyle].url} />
-          <MapResizer panelOpen={!!selectedCourt} />
+          <TileLayer key={tileStyle} url={TILE_STYLES[tileStyle].url} />
+          <TooltipListener onChange={setTooltipOpen} />
           <MapNavigator target={flyTarget} />
           <MapRef onMap={handleMapRef} />
           {courts.map((court) => (
-            <CourtMarker
-              key={court.id}
-              court={court}
-              onClick={handlePinClick}
-            />
+            <CourtMarker key={court.id} court={court} />
           ))}
           {userLocation && (
             <Marker position={userLocation} icon={userIcon} />
@@ -307,30 +295,27 @@ export default function Discover() {
       </div>
 
       <Header user={user} onLogout={logout} dark={isDark} />
-      <SearchBar onNavigate={handleNavigate} dark={isDark} />
-      <button
-        type="button"
-        onClick={handleDiscover}
-        className={`group absolute top-[10.5rem] left-1/2 z-20 flex items-center gap-2.5 pl-4 pr-5 py-2.5 rounded-full backdrop-blur-[24px] backdrop-saturate-[180%] shadow-[0_8px_24px_rgba(0,0,0,0.12),0_16px_48px_rgba(0,0,0,0.06)] animate-float transition-shadow duration-300 hover:shadow-[0_12px_32px_rgba(0,0,0,0.18),0_24px_60px_rgba(0,0,0,0.1)] active:scale-95 ${
-          isDark
-            ? "bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.14)]"
-            : "bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.25)] hover:bg-[rgba(255,255,255,0.25)]"
-        }`}
-      >
-        <span className="text-[18px] transition-transform duration-300 group-hover:rotate-[360deg]">🏀</span>
-        <span className={`font-['Square_Sans_Serif_7',sans-serif] text-[13px] uppercase tracking-[3px] ${
-          isDark ? "text-[rgba(255,255,255,0.8)]" : "text-[rgba(0,0,0,0.55)]"
-        }`}>
-          Discover
-        </span>
-      </button>
-      <ShotClockRow sessions={sessions} courts={courts} />
-
-      <MapStyleSwitcher active={tileStyle} onChange={setTileStyle} />
-
-      {selectedCourt && (
-        <SidePanel court={selectedCourt} onClose={handleClosePanel} />
+      {!tooltipOpen && <SearchBar onNavigate={handleNavigate} dark={isDark} />}
+      {!tooltipOpen && (
+        <button
+          type="button"
+          onClick={handleDiscover}
+          className={`group absolute top-[10.5rem] left-1/2 z-[5] flex items-center gap-2.5 pl-4 pr-5 py-2.5 rounded-full backdrop-blur-[24px] backdrop-saturate-[180%] shadow-[0_8px_24px_rgba(0,0,0,0.12),0_16px_48px_rgba(0,0,0,0.06)] animate-float transition-shadow duration-300 hover:shadow-[0_12px_32px_rgba(0,0,0,0.18),0_24px_60px_rgba(0,0,0,0.1)] active:scale-95 ${
+            isDark
+              ? "bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.14)]"
+              : "bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.25)] hover:bg-[rgba(255,255,255,0.25)]"
+          }`}
+        >
+          <span className="text-[18px] transition-transform duration-300 group-hover:rotate-[360deg]">🏀</span>
+          <span className={`font-['Space_Grotesk',sans-serif] text-[13px] uppercase tracking-[3px] ${
+            isDark ? "text-[rgba(255,255,255,0.8)]" : "text-[rgba(0,0,0,0.55)]"
+          }`}>
+            Discover
+          </span>
+        </button>
       )}
+      <ShotClockRow sessions={sessions} courts={courts} />
+      <MapStyleSwitcher active={tileStyle} onChange={setTileStyle} />
     </div>
   );
 }

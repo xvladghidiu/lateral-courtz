@@ -16,15 +16,6 @@ function DiscoverIcon() {
   );
 }
 
-function GamesIcon() {
-  return (
-    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <circle cx="12" cy="12" r="10" />
-      <path d="M12 6v6l4 2" />
-    </svg>
-  );
-}
-
 function BookingsIcon() {
   return (
     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -45,9 +36,8 @@ function ProfileIcon() {
 
 const TABS: TabDef[] = [
   { to: "/", label: "Discover", icon: <DiscoverIcon /> },
-  { to: "/dashboard", label: "Games", icon: <GamesIcon /> },
-  { to: "/bookings", label: "Bookings", icon: <BookingsIcon /> },
-  { to: "/profile", label: "Profile", icon: <ProfileIcon /> },
+  { to: "/dashboard", label: "Bookings", icon: <BookingsIcon /> },
+  { to: "/login", label: "Profile", icon: <ProfileIcon /> },
 ];
 
 function TabItem({ tab }: { tab: TabDef }) {

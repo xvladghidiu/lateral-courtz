@@ -17,12 +17,12 @@ function Slot({
   const insetClass = size === "sm" ? "after:inset-[3px] after:rounded-sm" : "after:inset-1 after:rounded-[3px]";
   if (!isFilled) {
     return (
-      <div className={`flex-1 rounded-md transition-all duration-300 relative ${h} bg-[rgba(255,255,255,0.02)] border border-border`} />
+      <div className={`flex-1 rounded-md transition-all duration-300 relative ${h} bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.1)]`} />
     );
   }
   const colorClasses = isOrange
-    ? `bg-[rgba(232,114,13,0.15)] border border-[rgba(232,114,13,0.2)] after:bg-accent-orange`
-    : `bg-[rgba(230,51,40,0.15)] border border-[rgba(230,51,40,0.2)] after:bg-accent-red`;
+    ? `bg-[rgba(255,255,255,0.18)] border border-[rgba(255,255,255,0.25)] after:bg-[rgba(255,255,255,0.4)]`
+    : `bg-[rgba(255,255,255,0.12)] border border-[rgba(255,255,255,0.2)] after:bg-[rgba(255,255,255,0.6)]`;
 
   return (
     <div className={`flex-1 rounded-md transition-all duration-300 relative ${h} ${colorClasses} after:content-[''] after:absolute ${insetClass} after:opacity-60`} />
@@ -49,7 +49,7 @@ export default function PlayerSlots({
         ))}
       </div>
       <div className="text-sm font-bold tracking-[-0.5px] whitespace-nowrap min-w-[42px] text-right">
-        {filled} <span className="text-text-muted font-normal">/{total}</span>
+        {filled} <span className="text-[rgba(255,255,255,0.4)] font-normal">/{total}</span>
       </div>
     </div>
   );

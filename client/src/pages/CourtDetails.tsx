@@ -1,168 +1,16 @@
 import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import type { Court, Session, Review, CreateReviewInput } from "@shared/types/index.js";
+import type { Review, CreateReviewInput } from "@shared/types/index.js";
 import { useCourt } from "../hooks/useCourts.js";
-import { useCourtSessions } from "../hooks/useSessions.js";
 import { useReviews, usePostReview } from "../hooks/useReviews.js";
 import { useAuth } from "../context/AuthContext.js";
-import Header from "../components/Header.js";
-import PlayerSlots from "../components/PlayerSlots.js";
-import ReviewCard from "../components/ReviewCard.js";
-import { capitalize } from "../components/utils.js";
+import CourtHeader from "../components/CourtHeader.js";
+import RatingBreakdown from "../components/RatingBreakdown.js";
+import BookingSidebar from "../components/BookingSidebar.js";
+import CourtLocationMap from "../components/CourtLocationMap.js";
+import MobileBookingBar from "../components/MobileBookingBar.js";
 
-/* ── helpers ──────────────────────────────────────────────── */
-
-function todayDate(): string {
-  return new Date().toISOString().split("T")[0]!;
-}
-
-/* ── sub-components: Court Header ────────────────────────── */
-
-function TypeBadge({ type }: { type: string }) {
-  return (
-    <span className="text-[11px] font-semibold uppercase tracking-[0.5px] px-2.5 py-1 rounded-md bg-surface-2 border border-border">
-      {type === "indoor" ? "Indoor" : "Outdoor"}
-    </span>
-  );
-}
-
-function SurfaceBadge({ surface }: { surface: string }) {
-  return (
-    <span className="text-[11px] font-semibold uppercase tracking-[0.5px] px-2.5 py-1 rounded-md bg-surface-2 border border-border">
-      {capitalize(surface)}
-    </span>
-  );
-}
-
-function RatingDisplay({ rating, reviewCount }: { rating: number; reviewCount: number }) {
-  return (
-    <div className="flex items-center gap-1.5">
-      <span className="text-accent-amber font-semibold text-sm">{"★".repeat(Math.round(rating))}</span>
-      <span className="text-sm font-semibold">{rating.toFixed(1)}</span>
-      <span className="text-xs text-text-muted">({reviewCount} reviews)</span>
-    </div>
-  );
-}
-
-function AmenityPill({ label }: { label: string }) {
-  return (
-    <span className="text-[11px] px-3 py-1 rounded-full bg-surface-2 border border-border text-text-secondary">
-      {label}
-    </span>
-  );
-}
-
-function CourtHeader({ court }: { court: Court }) {
-  return (
-    <div className="mb-8">
-      <h1 className="text-3xl font-bold tracking-tight mb-2">{court.name}</h1>
-      <p className="text-sm text-text-secondary mb-4">{court.address}</p>
-      <div className="flex items-center gap-2.5 flex-wrap mb-4">
-        <TypeBadge type={court.type} />
-        <SurfaceBadge surface={court.surface} />
-        <RatingDisplay rating={court.rating} reviewCount={court.reviewCount} />
-      </div>
-      <div className="flex gap-2 flex-wrap mb-4">
-        {court.amenities.map((a) => <AmenityPill key={a} label={a} />)}
-      </div>
-      <div className="text-2xl font-bold tracking-tight">
-        ${court.pricePerPlayerPerHour}
-        <span className="text-sm font-normal text-text-muted"> / player / hr</span>
-      </div>
-    </div>
-  );
-}
-
-/* ── sub-components: Sessions Section ────────────────────── */
-
-function DatePicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  return (
-    <input
-      type="date"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="bg-surface border border-border rounded-lg px-4 py-2.5 text-sm focus:border-accent-red transition"
-    />
-  );
-}
-
-function SessionCTAs({ courtId }: { courtId: string }) {
-  return (
-    <div className="flex gap-3">
-      <Link
-        to={`/sessions/new?courtId=${courtId}&mode=open`}
-        className="bg-accent-red text-white rounded-lg px-5 py-2.5 font-medium text-sm hover:shadow-[0_4px_20px_rgba(230,51,40,0.35)] transition-all"
-      >
-        Create a Game
-      </Link>
-      <Link
-        to={`/sessions/new?courtId=${courtId}&mode=private`}
-        className="bg-surface-2 border border-border text-text-primary rounded-lg px-5 py-2.5 font-medium text-sm hover:border-border-hover transition-all"
-      >
-        Book Full Court
-      </Link>
-    </div>
-  );
-}
-
-function SessionRow({ session, onJoin }: { session: Session; onJoin: () => void }) {
-  const spotsLeft = session.maxPlayers - session.players.length;
-
-  return (
-    <div className="bg-surface border border-border rounded-2xl p-5">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-bold">{session.format}</span>
-          <span className="text-xs text-text-muted">{session.startTime}</span>
-          <span className="text-xs text-text-muted">{session.durationMinutes}min</span>
-        </div>
-        {spotsLeft > 0 && (
-          <button
-            type="button"
-            onClick={onJoin}
-            className="bg-accent-red text-white rounded-lg px-4 py-2 text-xs font-semibold hover:shadow-[0_4px_20px_rgba(230,51,40,0.35)] transition-all"
-          >
-            Join
-          </button>
-        )}
-      </div>
-      <PlayerSlots filled={session.players.length} total={session.maxPlayers} size="sm" />
-    </div>
-  );
-}
-
-function SessionsList({ sessions }: { sessions: Session[] }) {
-  const navigate = useNavigate();
-
-  if (!sessions.length) {
-    return <p className="text-sm text-text-muted py-6">No sessions for this date</p>;
-  }
-
-  return (
-    <div className="flex flex-col gap-3">
-      {sessions.map((s) => (
-        <SessionRow key={s.id} session={s} onJoin={() => navigate(`/sessions/${s.id}`)} />
-      ))}
-    </div>
-  );
-}
-
-function SessionsSection({ courtId, sessions }: { courtId: string; sessions: Session[] }) {
-  const [date, setDate] = useState(todayDate);
-
-  return (
-    <section className="mb-10">
-      <h2 className="text-xl font-semibold tracking-tight mb-4">Sessions</h2>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4 flex-wrap">
-        <DatePicker value={date} onChange={setDate} />
-        <SessionCTAs courtId={courtId} />
-      </div>
-      <SessionsList sessions={sessions} />
-    </section>
-  );
-}
-
-/* ── sub-components: Review Form ─────────────────────────── */
+/* ── Review sub-components (kept inline, same page concern) ── */
 
 function StarSelector({ value, onChange }: { value: number; onChange: (v: number) => void }) {
   return (
@@ -174,8 +22,8 @@ function StarSelector({ value, onChange }: { value: number; onChange: (v: number
           onClick={() => onChange(n)}
           className={`w-8 h-8 rounded-md text-sm font-bold transition ${
             n <= value
-              ? "bg-accent-amber text-bg"
-              : "bg-surface-2 border border-border text-text-muted"
+              ? "bg-[rgba(255,255,255,0.15)] text-white"
+              : "bg-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.4)]"
           }`}
         >
           {n}
@@ -193,13 +41,13 @@ function ReviewForm({ courtId }: { courtId: string }) {
 
   if (!user) {
     return (
-      <p className="text-sm text-text-muted mt-4">
-        <Link to="/login" className="text-accent-red hover:underline">Log in</Link> to leave a review
+      <p className="font-['Space_Grotesk',sans-serif] text-[11px] uppercase tracking-[1.5px] text-[rgba(255,255,255,0.4)] mt-4">
+        <Link to="/login" className="text-white hover:underline">Log in</Link> to leave a review
       </p>
     );
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const input: CreateReviewInput = { rating, comment };
     mutate(input, { onSuccess: () => setComment("") });
@@ -207,19 +55,22 @@ function ReviewForm({ courtId }: { courtId: string }) {
 
   return (
     <form onSubmit={handleSubmit} className="mt-6">
-      <h3 className="text-sm font-semibold mb-3">Add a review</h3>
+      <h3 className="font-['Space_Grotesk',sans-serif] text-[11px] uppercase tracking-[1.5px] text-[rgba(255,255,255,0.6)] mb-3">
+        Add a review
+      </h3>
       <StarSelector value={rating} onChange={setRating} />
       <textarea
         value={comment}
         onChange={(e) => setComment(e.target.value)}
         placeholder="Share your experience..."
         rows={3}
-        className="w-full bg-surface border border-border rounded-lg px-4 py-3 text-sm focus:border-accent-red transition placeholder:text-text-muted resize-none mb-3"
+        className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.1)] rounded-xl px-4 py-3 text-white text-[14px] focus:border-[rgba(255,255,255,0.25)] outline-none placeholder:text-[rgba(255,255,255,0.25)] resize-none mb-3"
       />
       <button
         type="submit"
         disabled={isPending || !comment.trim()}
-        className="bg-accent-red text-white rounded-lg px-5 py-2.5 font-medium text-sm hover:shadow-[0_4px_20px_rgba(230,51,40,0.35)] transition-all disabled:opacity-50"
+        className="text-white rounded-xl px-6 py-3 font-['Lixdu',sans-serif] text-[14px] uppercase tracking-[3px] hover:shadow-[0_4px_20px_rgba(232,120,23,0.4)] transition-all disabled:opacity-50"
+        style={{ backgroundImage: "url(/assets/basketball-leather.jpg)", backgroundSize: "cover", backgroundPosition: "center" }}
       >
         {isPending ? "Posting..." : "Submit review"}
       </button>
@@ -227,57 +78,127 @@ function ReviewForm({ courtId }: { courtId: string }) {
   );
 }
 
-function ReviewsSection({ courtId, reviews }: { courtId: string; reviews: Review[] }) {
+function ReviewItem({ review }: { review: Review }) {
+  const userName = review.userId.slice(0, 8);
+  const formatted = new Date(review.createdAt).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
   return (
-    <section className="mb-10">
-      <h2 className="text-xl font-semibold tracking-tight mb-4">Reviews</h2>
-      {reviews.length === 0 && <p className="text-sm text-text-muted">No reviews yet</p>}
+    <div className="py-3.5 border-b border-[rgba(255,255,255,0.08)]">
+      <div className="flex items-center gap-2.5 mb-1.5">
+        <span className="text-[#d4a012] text-[13px]">
+          {Array.from({ length: 5 }, (_, i) => (i < review.rating ? "\u2605" : "\u2606")).join("")}
+        </span>
+        <span className="text-[13px] text-[rgba(255,255,255,0.85)]">{userName}</span>
+        <span className="text-[11px] text-[rgba(255,255,255,0.4)]">{formatted}</span>
+      </div>
+      <p className="text-[13px] text-[rgba(255,255,255,0.7)] leading-normal">{review.comment}</p>
+    </div>
+  );
+}
+
+function ReviewsSection({ courtId, reviews, rating }: { courtId: string; reviews: Review[]; rating: number }) {
+  return (
+    <section className="pt-5">
+      <h3 className="font-['Space_Grotesk',sans-serif] text-[11px] uppercase tracking-[2px] text-[rgba(255,255,255,0.5)] mb-4">
+        Reviews
+      </h3>
+      <RatingBreakdown reviews={reviews} rating={rating} />
+      {reviews.length === 0 && (
+        <p className="font-['Space_Grotesk',sans-serif] text-[11px] uppercase tracking-[1.5px] text-[rgba(255,255,255,0.4)]">
+          No reviews yet
+        </p>
+      )}
       {reviews.map((r) => (
-        <ReviewCard key={r.id} review={r} userName={r.userId.slice(0, 8)} />
+        <ReviewItem key={r.id} review={r} />
       ))}
       <ReviewForm courtId={courtId} />
     </section>
   );
 }
 
-/* ── main page ────────────────────────────────────────────── */
+/* ── Loading / Error states ──────────────────────────────── */
 
-const EMPTY_SESSIONS: Session[] = [];
+function FullScreenMessage({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen bg-[#0a0a0c] flex items-center justify-center">
+      {children}
+    </div>
+  );
+}
+
+/* ── Main page ───────────────────────────────────────────── */
+
 const EMPTY_REVIEWS: Review[] = [];
 
 export default function CourtDetails() {
   const { id } = useParams<{ id: string }>();
-  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const { data: court, isLoading: courtLoading } = useCourt(id ?? "");
-  const { data: sessions = EMPTY_SESSIONS } = useCourtSessions(id ?? "", todayDate());
   const { data: reviews = EMPTY_REVIEWS } = useReviews(id ?? "");
 
   if (courtLoading) {
     return (
-      <div className="min-h-screen">
-        <Header user={user} onLogout={logout} />
-        <div className="max-w-[900px] mx-auto px-4 sm:px-8 py-10 text-text-muted">Loading court...</div>
-      </div>
+      <FullScreenMessage>
+        <span className="font-['Space_Grotesk',sans-serif] text-[12px] uppercase tracking-[2px] text-[rgba(255,255,255,0.5)]">
+          Loading court...
+        </span>
+      </FullScreenMessage>
     );
   }
 
   if (!court) {
     return (
-      <div className="min-h-screen">
-        <Header user={user} onLogout={logout} />
-        <div className="max-w-[900px] mx-auto px-4 sm:px-8 py-10 text-text-muted">Court not found</div>
-      </div>
+      <FullScreenMessage>
+        <span className="font-['Space_Grotesk',sans-serif] text-[12px] uppercase tracking-[2px] text-[#ff3b30]">
+          Court not found
+        </span>
+      </FullScreenMessage>
     );
   }
 
+  function handleBook() {
+    navigate(`/sessions/new?courtId=${court!.id}&mode=private`);
+  }
+
   return (
-    <div className="min-h-screen">
-      <Header user={user} onLogout={logout} />
-      <div className="max-w-[900px] mx-auto px-4 sm:px-8 py-10">
-        <CourtHeader court={court} />
-        <SessionsSection courtId={court.id} sessions={sessions} />
-        <ReviewsSection courtId={court.id} reviews={reviews} />
+    <div className="fixed inset-0 bg-[#0a0a0c] text-white overflow-y-auto z-10">
+      {/* Back button */}
+      <div className="max-w-[1200px] mx-auto px-4 md:px-8 pt-6">
+        <Link
+          to="/"
+          className="inline-block font-['Space_Grotesk',sans-serif] text-[10px] uppercase tracking-[1.5px] text-[rgba(255,255,255,0.4)] hover:text-white transition-colors mb-4"
+        >
+          &#8592; Back
+        </Link>
       </div>
+
+      {/* Two-column content */}
+      <div className="max-w-[1200px] mx-auto px-4 md:px-8">
+        <div className="md:grid md:grid-cols-[1fr_420px] md:gap-12 pt-8 pb-24 md:pb-8">
+          {/* Left: main content */}
+          <div>
+            <CourtHeader court={court} />
+            <ReviewsSection courtId={court.id} reviews={reviews} rating={court.rating} />
+          </div>
+
+          {/* Right: booking sidebar (desktop only) */}
+          <div className="hidden md:block">
+            <BookingSidebar court={court} />
+            <CourtLocationMap lat={court.lat} lng={court.lng} />
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile bottom bar */}
+      <MobileBookingBar
+        pricePerPlayerPerHour={court.pricePerPlayerPerHour}
+        onBook={handleBook}
+        disabled={false}
+      />
     </div>
   );
 }

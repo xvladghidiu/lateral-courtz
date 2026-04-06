@@ -6,8 +6,6 @@ import Login from "./pages/Login.js";
 import Register from "./pages/Register.js";
 import CourtDetails from "./pages/CourtDetails.js";
 import CreateSession from "./pages/CreateSession.js";
-import SessionDetails from "./pages/SessionDetails.js";
-import Checkout from "./pages/Checkout.js";
 import Dashboard from "./pages/Dashboard.js";
 import BottomTabs from "./components/BottomTabs.js";
 
@@ -20,15 +18,15 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <BrowserRouter>
+          {/* Discover is always mounted — hides itself when not on "/" */}
+          <Discover />
           <Routes>
-            <Route path="/" element={<Discover />} />
             <Route path="/courts/:id" element={<CourtDetails />} />
             <Route path="/sessions/new" element={<CreateSession />} />
-            <Route path="/sessions/:id" element={<SessionDetails />} />
-            <Route path="/checkout/:sessionId" element={<Checkout />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/bookings" element={<Dashboard />} />
           </Routes>
           <BottomTabs />
         </BrowserRouter>
