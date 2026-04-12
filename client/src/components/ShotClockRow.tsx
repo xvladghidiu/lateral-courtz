@@ -18,7 +18,7 @@ function currentlyPlaying(sessions: Session[]): number {
 
 export default function ShotClockRow({ sessions, courts }: ShotClockRowProps) {
   return (
-    <div className="absolute top-1/2 left-5 -translate-y-1/2 z-10 flex flex-col gap-5">
+    <div className="absolute bottom-6 right-5 z-10 flex gap-3">
       <ShotClock value={currentlyPlaying(sessions)} label="Playing Now" color="red" />
       <ShotClock value={sessions.length} label="Active Courts" color="red" />
       <ShotClock value={almostFullCount(sessions)} label="Filling" color="orange" />

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="60">
+  <defs>
+    <filter id="leather" x="0%" y="0%" width="100%" height="100%">
+      <!-- Large round pebble dimples -->
+      <feTurbulence type="turbulence" baseFrequency="0.35 0.3" numOctaves="2" seed="5" stitchTiles="stitch" result="bumps"/>
+      <!-- Deep shadows in valleys -->
+      <feDiffuseLighting in="bumps" lighting-color="#8B3A0F" surfaceScale="5" diffuseConstant="1" result="depth">
+        <feDistantLight azimuth="225" elevation="30"/>
+      </feDiffuseLighting>
+      <feBlend in="depth" in2="SourceGraphic" mode="multiply" result="base"/>
+      <!-- Highlights on pebble tops -->
+      <feSpecularLighting in="bumps" specularConstant="0.45" specularExponent="15" lighting-color="#FFCEA0" surfaceScale="4.5" result="shine">
+        <feDistantLight azimuth="225" elevation="45"/>
+      </feSpecularLighting>
+      <feComposite in="shine" in2="base" operator="atop" result="shiny"/>
+      <feBlend in="shiny" in2="base" mode="screen"/>
+    </filter>
+  </defs>
+  <rect width="600" height="60" fill="#9B3D12" filter="url(#leather)"/>
+</svg>

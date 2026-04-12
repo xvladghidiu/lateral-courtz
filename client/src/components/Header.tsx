@@ -1,36 +1,37 @@
 import { Link } from "react-router-dom";
 import type { PublicUser } from "@shared/types/index.js";
+import { type TileStyle, isDarkTile } from "../pages/Discover.js";
 
 interface HeaderProps {
   user: PublicUser | null;
   onLogout: () => void;
-  dark?: boolean;
+  tileStyle: TileStyle;
 }
 
-function BrandSection({ dark }: { dark: boolean }) {
+const BRAND_COLORS: Record<TileStyle, string> = {
+  dark: "text-[rgba(255,255,255,0.3)]",
+  satellite: "text-[rgba(255,255,255,0.25)]",
+  voyager: "text-[rgba(60,40,20,0.2)]",
+  light: "text-[rgba(0,0,0,0.15)]",
+};
+
+function VerticalLabel({ side, text, color }: { side: "left" | "right"; text: string; color: string }) {
   return (
-    <Link to="/" className="flex items-center gap-3 no-underline">
-      <span className={`font-['Lixdu',sans-serif] text-[26px] uppercase tracking-[3px] ${
-        dark
-          ? "text-[rgba(255,255,255,0.85)] [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]"
-          : "text-[rgba(0,0,0,0.55)] [text-shadow:0_1px_3px_rgba(0,0,0,0.1)]"
-      }`}>
-        Lateral Courtz
+    <div className={`fixed ${side}-0 top-0 bottom-0 z-[1] flex items-center pointer-events-none`}>
+      <span className={`font-['Lixdu',sans-serif] text-[80px] uppercase tracking-[12px] ${color} [writing-mode:vertical-rl] ${side === "left" ? "rotate-180" : ""} select-none`}>
+        {text}
       </span>
-    </Link>
+    </div>
   );
 }
 
-function NavLinks({ dark }: { dark: boolean }) {
+function NavLink({ dark }: { dark: boolean }) {
   const btnClass = dark
     ? "font-['Space_Grotesk',sans-serif] uppercase tracking-[2px] px-5 py-2.5 text-[11px] text-[rgba(255,255,255,0.7)] bg-[rgba(255,255,255,0.1)] backdrop-blur-[16px] border border-[rgba(255,255,255,0.15)] rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.2)] hover:bg-[rgba(255,255,255,0.2)] hover:text-white transition-all no-underline"
     : "font-['Space_Grotesk',sans-serif] uppercase tracking-[2px] px-5 py-2.5 text-[11px] text-[rgba(0,0,0,0.6)] bg-[rgba(255,255,255,0.8)] backdrop-blur-[16px] border border-[rgba(0,0,0,0.08)] rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.95)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all no-underline";
 
   return (
-    <nav className="hidden sm:flex items-center gap-2">
-      <Link to="/dashboard" className={btnClass}>My Games</Link>
-      <Link to="/bookings" className={btnClass}>Bookings</Link>
-    </nav>
+    <Link to="/bookings" className={`hidden sm:block ${btnClass}`}>Bookings</Link>
   );
 }
 
@@ -47,14 +48,16 @@ function UserAvatar({ name, onLogout }: { name: string; onLogout: () => void }) 
   );
 }
 
-export default function Header({ user, onLogout, dark = false }: HeaderProps) {
+export default function Header({ user, onLogout, tileStyle }: HeaderProps) {
+  const dark = isDarkTile(tileStyle);
+  const color = BRAND_COLORS[tileStyle];
+
   return (
-    <header className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-5 h-14 pointer-events-none">
-      <div className="pointer-events-auto">
-        <BrandSection dark={dark} />
-      </div>
+    <header className="absolute top-0 left-0 right-0 z-30 flex items-center justify-end px-5 h-14 pointer-events-none">
+      <VerticalLabel side="left" text="Lateral" color={color} />
+      <VerticalLabel side="right" text="Courtz" color={color} />
       <div className="flex items-center gap-5 pointer-events-auto">
-        <NavLinks dark={dark} />
+        <NavLink dark={dark} />
         {user && <UserAvatar name={user.name} onLogout={onLogout} />}
       </div>
     </header>

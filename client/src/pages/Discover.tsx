@@ -18,7 +18,7 @@ const TILE_STYLES = {
   satellite: { url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", label: "Satellite" },
 } as const;
 
-type TileStyle = keyof typeof TILE_STYLES;
+export type TileStyle = keyof typeof TILE_STYLES;
 
 const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
 const EMPTY_COURTS: Court[] = [];
@@ -31,7 +31,7 @@ interface SearchResult {
   lon: string;
 }
 
-function isDarkTile(style: TileStyle): boolean {
+export function isDarkTile(style: TileStyle): boolean {
   return style === "dark" || style === "satellite";
 }
 
@@ -264,6 +264,12 @@ export default function Discover() {
   // Always mounted — hide when not on home route
   const isVisible = location.pathname === "/";
 
+  useEffect(() => {
+    if (!isVisible || !mapRef.current) return;
+    const timer = setTimeout(() => mapRef.current?.invalidateSize(), 50);
+    return () => clearTimeout(timer);
+  }, [isVisible]);
+
   if (!geoReady) {
     return (
       <div className="relative w-screen h-screen overflow-hidden bg-[#1a1a1e]" style={{ display: isVisible ? undefined : "none" }} />
@@ -294,7 +300,7 @@ export default function Discover() {
         </MapContainer>
       </div>
 
-      <Header user={user} onLogout={logout} dark={isDark} />
+      <Header user={user} onLogout={logout} tileStyle={tileStyle} />
       {!tooltipOpen && <SearchBar onNavigate={handleNavigate} dark={isDark} />}
       {!tooltipOpen && (
         <button

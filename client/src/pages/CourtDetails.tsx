@@ -186,7 +186,7 @@ export default function CourtDetails() {
           </div>
 
           {/* Right: booking sidebar (desktop only) */}
-          <div className="hidden md:block">
+          <div className="hidden md:block self-start sticky top-8">
             <BookingSidebar court={court} />
             <CourtLocationMap lat={court.lat} lng={court.lng} />
           </div>
