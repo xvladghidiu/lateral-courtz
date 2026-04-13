@@ -23,9 +23,9 @@ export function courtIcon(id: string, name: string, price: number, rating: numbe
         <div style="width:44px;height:44px;border-radius:50%;background:rgba(12,12,14,0.9);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.12);flex-shrink:0">
           <img src="/assets/basketball-pin.png" alt="" style="width:28px;height:28px;border-radius:50%;image-rendering:pixelated" />
         </div>
-        <div style="background:rgba(12,12,14,0.9);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:8px 14px;font-family:'Space Grotesk',sans-serif;min-width:100px">
+        <div style="background:rgba(12,12,14,0.9);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:10px 18px;font-family:'Space Grotesk',sans-serif;min-width:120px">
           <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.85);letter-spacing:0.3px;white-space:nowrap;margin-bottom:4px">${shortName}</div>
-          <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px;white-space:nowrap">
             <span style="font-family:'DSEG',monospace;font-size:16px;font-weight:700;color:rgba(255,255,255,0.9)">$${price}</span>
             <span style="font-size:11px;color:#d4a012;font-weight:600">★ ${rating}</span>
           </div>

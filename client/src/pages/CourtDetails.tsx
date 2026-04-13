@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { MapContainer, TileLayer } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 import type { Review, CreateReviewInput } from "@shared/types/index.js";
 import { useCourt } from "../hooks/useCourts.js";
 import { useReviews, usePostReview } from "../hooks/useReviews.js";
@@ -165,7 +167,29 @@ export default function CourtDetails() {
   }
 
   return (
-    <div className="fixed inset-0 bg-[#0a0a0c] text-white overflow-y-auto z-10">
+    <div className="fixed inset-0 text-white z-10">
+      {/* Dark map background */}
+      <div className="fixed inset-0 z-0">
+        <MapContainer
+          center={[court.lat, court.lng]}
+          zoom={13}
+          zoomControl={false}
+          attributionControl={false}
+          dragging={false}
+          scrollWheelZoom={false}
+          doubleClickZoom={false}
+          touchZoom={false}
+          keyboard={false}
+          className="w-full h-full"
+          style={{ height: "100%", width: "100%" }}
+        >
+          <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
+        </MapContainer>
+      </div>
+      <div className="fixed inset-0 z-[1] bg-[rgba(10,10,12,0.85)]" />
+
+      {/* Content */}
+      <div className="relative z-[2] h-full overflow-y-auto">
       {/* Back button */}
       <div className="max-w-[1200px] mx-auto px-4 md:px-8 pt-6">
         <Link
@@ -199,6 +223,7 @@ export default function CourtDetails() {
         onBook={handleBook}
         disabled={false}
       />
+      </div>
     </div>
   );
 }

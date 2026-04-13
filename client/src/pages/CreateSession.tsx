@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
-import { useSearchParams, useNavigate, Navigate, Link } from "react-router-dom";
+import { useState, useCallback, useRef, useEffect } from "react";
+import { useSearchParams, Navigate, Link } from "react-router-dom";
 import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { SessionFormat, SessionMode, CreateSessionInput } from "@shared/types/index.js";
@@ -8,10 +8,18 @@ import { useCourt } from "../hooks/useCourts.js";
 import { useCreateSession } from "../hooks/useSessions.js";
 import { useAuth } from "../context/AuthContext.js";
 import GlassCalendar from "../components/GlassCalendar.js";
-import { todayDate } from "../components/utils.js";
+import { todayDate, formatTime } from "../components/utils.js";
+import {
+  formatCardNumber,
+  detectBrand,
+  luhnCheck,
+  formatExpiry,
+  isExpiryValid,
+  isCvvValid,
+} from "../lib/cardUtils.js";
 
 const DURATIONS = [30, 60, 90, 120] as const;
-const STEPS = ["date", "options", "confirm", "success"] as const;
+const STEPS = ["date", "options", "payment", "success"] as const;
 type Step = typeof STEPS[number];
 
 /* ── Step indicator ──────────────────────────────────────── */
@@ -221,16 +229,8 @@ function formatDisplayDate(dateStr: string): string {
   return new Date(dateStr + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
 }
 
-function formatTime(time: string): string {
-  const [h] = time.split(":");
-  const hour = parseInt(h!, 10);
-  if (hour === 0) return "12:00 AM";
-  if (hour < 12) return `${hour}:00 AM`;
-  if (hour === 12) return "12:00 PM";
-  return `${hour - 12}:00 PM`;
-}
 
-function StepConfirm({
+function StepPayment({
   courtName,
   date,
   time,
@@ -238,7 +238,6 @@ function StepConfirm({
   format,
   mode,
   pricePerHour,
-  isPending,
   onSubmit,
   onBack,
 }: {
@@ -249,55 +248,179 @@ function StepConfirm({
   format: SessionFormat;
   mode: SessionMode;
   pricePerHour: number;
-  isPending: boolean;
   onSubmit: () => void;
   onBack: () => void;
 }) {
+  const [cardName, setCardName] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [processing, setProcessing] = useState(false);
+
   const pricePerPlayer = pricePerHour * (duration / 60);
   const totalPlayers = MAX_PLAYERS[format];
+  const brand = detectBrand(cardNumber);
+
+  const cardNumberValid = luhnCheck(cardNumber);
+  const expiryValid = isExpiryValid(expiry);
+  const cvvValid = isCvvValid(cvv);
+  const nameValid = cardName.trim().length > 0;
+  const allValid = nameValid && cardNumberValid && expiryValid && cvvValid;
+
+  function handleBlur(field: string) {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  }
+
+  function inputClass(valid: boolean, field: string): string {
+    const base = "w-full bg-[rgba(255,255,255,0.06)] rounded-xl px-4 py-3.5 text-[16px] font-bold text-white font-['Space_Grotesk',sans-serif] outline-none transition-colors placeholder:text-[rgba(255,255,255,0.2)] placeholder:font-normal placeholder:text-[14px]";
+    if (touched[field] && !valid) return `${base} border border-[rgba(255,59,48,0.5)]`;
+    return `${base} border border-[rgba(255,255,255,0.1)] focus:border-[rgba(255,255,255,0.25)]`;
+  }
+
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => {
+    return () => clearTimeout(timerRef.current);
+  }, []);
+
+  function handlePay() {
+    if (!allValid || processing) return;
+    setProcessing(true);
+    timerRef.current = setTimeout(() => {
+      onSubmit();
+    }, 1500);
+  }
 
   return (
     <div className="animate-fade-in-up" style={{ animationDuration: "0.3s", animationFillMode: "forwards" }}>
       <h2 className="font-['Lixdu',sans-serif] text-[36px] uppercase tracking-[4px] text-white mb-2 text-center">
-        Confirm
+        Payment
       </h2>
       <p className="font-['Space_Grotesk',sans-serif] text-[11px] text-[rgba(255,255,255,0.35)] text-center mb-6">
-        Review your booking details
+        Complete your booking
       </p>
 
-      {/* Summary card */}
-      <div className="bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-xl px-5 py-2 mb-4">
-        <SummaryRow label="Court" value={courtName} />
-        <SummaryRow label="Date" value={formatDisplayDate(date)} />
-        <SummaryRow label="Time" value={formatTime(time)} />
-        <SummaryRow label="Duration" value={`${duration} min`} />
-        <SummaryRow label="Format" value={format} />
-        <SummaryRow label="Type" value={mode === "open" ? "Open Game" : "Full Court"} />
-        <SummaryRow label="Players" value={`${totalPlayers}`} />
+      {/* Two-column layout */}
+      <div className="flex flex-col md:flex-row md:items-stretch gap-4">
+        {/* Left: Booking Summary */}
+        <div className="hidden md:flex md:flex-col flex-1 bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-xl px-5 py-2">
+          <SummaryRow label="Court" value={courtName} />
+          <SummaryRow label="Date" value={formatDisplayDate(date)} />
+          <SummaryRow label="Time" value={formatTime(time)} />
+          <SummaryRow label="Duration" value={`${duration} min`} />
+          <SummaryRow label="Format" value={format} />
+          <SummaryRow label="Type" value={mode === "open" ? "Open Game" : "Full Court"} />
+          <SummaryRow label="Players" value={`${totalPlayers}`} />
+          <div className="border-t border-[rgba(255,255,255,0.1)] mt-auto pt-3 pb-2 text-center">
+            <span className="font-['DSEG',monospace] text-[28px] text-[rgba(255,255,255,0.9)]">${pricePerPlayer}</span>
+            <span className="font-['Space_Grotesk',sans-serif] text-[11px] text-[rgba(255,255,255,0.35)] ml-2">/ player</span>
+          </div>
+        </div>
+
+        {/* Mobile: compact summary */}
+        <div className="md:hidden text-center mb-2">
+          <div className="font-['Space_Grotesk',sans-serif] text-[11px] text-[rgba(255,255,255,0.4)]">
+            {courtName} · {formatDisplayDate(date)} · {formatTime(time)} · {format}
+          </div>
+          <span className="font-['DSEG',monospace] text-[28px] text-[rgba(255,255,255,0.9)]">${pricePerPlayer}</span>
+          <span className="font-['Space_Grotesk',sans-serif] text-[11px] text-[rgba(255,255,255,0.35)] ml-2">/ player</span>
+        </div>
+
+        {/* Right: Card Form */}
+        <div className="flex-1 flex flex-col gap-3 bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-xl px-5 py-4">
+          {/* Cardholder Name */}
+          <div>
+            <span className="font-['Space_Grotesk',sans-serif] text-[11px] font-semibold uppercase tracking-[1.5px] text-[rgba(255,255,255,0.45)] mb-1.5 block">
+              Cardholder Name
+            </span>
+            <input
+              type="text"
+              value={cardName}
+              onChange={(e) => setCardName(e.target.value)}
+              onBlur={() => handleBlur("name")}
+              placeholder="Full name on card"
+              className={inputClass(nameValid, "name")}
+            />
+          </div>
+
+          {/* Card Number */}
+          <div>
+            <span className="font-['Space_Grotesk',sans-serif] text-[11px] font-semibold uppercase tracking-[1.5px] text-[rgba(255,255,255,0.45)] mb-1.5 block">
+              Card Number
+            </span>
+            <div className="relative">
+              <input
+                type="text"
+                inputMode="numeric"
+                value={formatCardNumber(cardNumber)}
+                onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, "").slice(0, 16))}
+                onBlur={() => handleBlur("card")}
+                placeholder="4242 4242 4242 4242"
+                maxLength={19}
+                className={inputClass(cardNumberValid, "card")}
+              />
+              {brand && (
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 font-['Space_Grotesk',sans-serif] text-[10px] uppercase tracking-[1px] text-[rgba(255,255,255,0.3)]">
+                  {brand}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Expiry + CVV */}
+          <div className="flex gap-2.5">
+            <div className="flex-1">
+              <span className="font-['Space_Grotesk',sans-serif] text-[11px] font-semibold uppercase tracking-[1.5px] text-[rgba(255,255,255,0.45)] mb-1.5 block">
+                Expiry
+              </span>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={expiry}
+                onChange={(e) => setExpiry(formatExpiry(e.target.value))}
+                onBlur={() => handleBlur("expiry")}
+                placeholder="MM/YY"
+                maxLength={5}
+                className={inputClass(expiryValid, "expiry")}
+              />
+            </div>
+            <div className="flex-1">
+              <span className="font-['Space_Grotesk',sans-serif] text-[11px] font-semibold uppercase tracking-[1.5px] text-[rgba(255,255,255,0.45)] mb-1.5 block">
+                CVV
+              </span>
+              <input
+                type="password"
+                inputMode="numeric"
+                value={cvv}
+                onChange={(e) => setCvv(e.target.value.replace(/\D/g, "").slice(0, 3))}
+                onBlur={() => handleBlur("cvv")}
+                placeholder="···"
+                maxLength={3}
+                className={inputClass(cvvValid, "cvv")}
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Price */}
-      <div className="text-center mb-6">
-        <span className="font-['DSEG',monospace] text-[36px] text-[rgba(255,255,255,0.9)]">${pricePerPlayer}</span>
-        <span className="font-['Space_Grotesk',sans-serif] text-[11px] text-[rgba(255,255,255,0.35)] ml-2">/ player</span>
-      </div>
-
-      <div className="flex gap-3">
+      {/* Buttons — full width below both sections */}
+      <div className="flex gap-3 mt-5">
         <button
           type="button"
           onClick={onBack}
-          className="flex-1 py-3.5 rounded-xl font-['Lixdu',sans-serif] text-[14px] uppercase tracking-[3px] bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.6)] hover:bg-[rgba(255,255,255,0.12)] hover:text-white transition-all"
+          className="flex-1 py-5 px-8 rounded-xl font-['Lixdu',sans-serif] text-[16px] uppercase tracking-[1.5px] whitespace-nowrap bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.6)] hover:bg-[rgba(255,255,255,0.12)] hover:text-white transition-all"
         >
           ← Back
         </button>
         <button
           type="button"
-          onClick={onSubmit}
-          disabled={isPending}
-          className="flex-[2] py-3.5 rounded-xl font-['Lixdu',sans-serif] text-[14px] uppercase tracking-[3px] text-white hover:shadow-[0_4px_20px_rgba(232,120,23,0.4)] transition-all disabled:opacity-50"
+          onClick={handlePay}
+          disabled={!allValid || processing}
+          className="flex-[2] py-5 rounded-xl font-['Lixdu',sans-serif] text-[16px] uppercase tracking-[2px] whitespace-nowrap text-white hover:shadow-[0_4px_20px_rgba(232,120,23,0.4)] transition-all disabled:opacity-50"
           style={{ backgroundImage: "url(/assets/basketball-leather.jpg)", backgroundSize: "cover", backgroundPosition: "center" }}
         >
-          {isPending ? "Booking..." : "🏀 Book It"}
+          {processing ? "Processing..." : `🏀 Pay $${pricePerPlayer}`}
         </button>
       </div>
     </div>
@@ -361,12 +484,11 @@ function StepSuccess({
 export default function CreateSession() {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const courtId = searchParams.get("courtId") ?? "";
   const initialMode = (searchParams.get("mode") as SessionMode) ?? "open";
 
   const { data: court } = useCourt(courtId);
-  const { mutate, isPending } = useCreateSession();
+  const { mutate } = useCreateSession();
 
   const [step, setStep] = useState<Step>("date");
   const [date, setDate] = useState(todayDate);
@@ -389,7 +511,7 @@ export default function CreateSession() {
     mutate(input, {
       onSuccess: () => setStep("success"),
     });
-  }, [courtId, date, startTime, duration, format, mode, mutate, navigate]);
+  }, [courtId, date, startTime, duration, format, mode, mutate]);
 
   if (!user) {
     return <Navigate to="/login" state={{ from: `/sessions/new?courtId=${courtId}&mode=${initialMode}` }} replace />;
@@ -440,7 +562,7 @@ export default function CreateSession() {
 
         {/* Step content — centered */}
         <div className="flex-1 flex items-center justify-center px-6 pb-10 overflow-y-auto">
-          <div className="w-full max-w-[540px]">
+          <div className={`w-full ${step === "payment" ? "max-w-[720px]" : "max-w-[540px]"}`}>
             {step === "date" && (
               <StepDate
                 date={date}
@@ -459,13 +581,13 @@ export default function CreateSession() {
                 onDuration={setDuration}
                 onFormat={(f) => setFormat(f as SessionFormat)}
                 onMode={(m) => setMode(m as SessionMode)}
-                onNext={() => setStep("confirm")}
+                onNext={() => setStep("payment")}
                 onBack={() => setStep("date")}
               />
             )}
 
-            {step === "confirm" && court && (
-              <StepConfirm
+            {step === "payment" && court && (
+              <StepPayment
                 courtName={court.name}
                 date={date}
                 time={startTime}
@@ -473,7 +595,6 @@ export default function CreateSession() {
                 format={format}
                 mode={mode}
                 pricePerHour={court.pricePerPlayerPerHour}
-                isPending={isPending}
                 onSubmit={handleSubmit}
                 onBack={() => setStep("options")}
               />

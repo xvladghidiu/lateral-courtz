@@ -35,26 +35,52 @@ export function isDarkTile(style: TileStyle): boolean {
   return style === "dark" || style === "satellite";
 }
 
-function SearchBar({ onNavigate, dark }: { onNavigate: (lat: number, lng: number) => void; dark: boolean }) {
+function SearchBar({ onNavigate, onCourtSelect, dark, courts }: { onNavigate: (lat: number, lng: number) => void; onCourtSelect: (court: Court) => void; dark: boolean; courts: Court[] }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
+  const lowerQuery = query.toLowerCase();
+
+  const nameMatches = query.length >= 2
+    ? courts.filter((c) => c.name.toLowerCase().includes(lowerQuery) || c.address.toLowerCase().includes(lowerQuery))
+    : [];
+
+  const nearbyMatches = results.length > 0 && nameMatches.length === 0
+    ? courts.filter((c) => results.some((r) => {
+        const dLat = Math.abs(c.lat - parseFloat(r.lat));
+        const dLng = Math.abs(c.lng - parseFloat(r.lon));
+        return dLat < 0.5 && dLng < 0.5;
+      }))
+    : [];
+
+  const matchedCourts = nameMatches.length > 0 ? nameMatches : nearbyMatches;
+  const hasResults = results.length > 0 || matchedCourts.length > 0;
+
   function handleInput(value: string) {
     setQuery(value);
     clearTimeout(debounceRef.current);
+    const lower = value.toLowerCase();
+    const localMatches = value.length >= 2
+      ? courts.filter((c) => c.name.toLowerCase().includes(lower) || c.address.toLowerCase().includes(lower))
+      : [];
     if (value.length < 3) {
       setResults([]);
-      setIsOpen(false);
+      setIsOpen(localMatches.length > 0);
       return;
     }
+    setIsOpen(true);
     debounceRef.current = setTimeout(async () => {
-      const params = new URLSearchParams({ q: value, format: "json", limit: "5" });
-      const res = await fetch(`${NOMINATIM_URL}?${params}`);
-      const data: SearchResult[] = await res.json();
-      setResults(data);
-      setIsOpen(data.length > 0);
+      try {
+        const params = new URLSearchParams({ q: value, format: "json", limit: "5" });
+        const res = await fetch(`${NOMINATIM_URL}?${params}`);
+        const data: SearchResult[] = await res.json();
+        setResults(data);
+        setIsOpen(data.length > 0 || localMatches.length > 0);
+      } catch {
+        /* network error — keep showing local matches if any */
+      }
     }, 350);
   }
 
@@ -64,14 +90,20 @@ function SearchBar({ onNavigate, dark }: { onNavigate: (lat: number, lng: number
     onNavigate(parseFloat(result.lat), parseFloat(result.lon));
   }
 
+  function selectCourt(court: Court) {
+    setQuery(court.name);
+    setIsOpen(false);
+    onCourtSelect(court);
+  }
+
   return (
-    <div className="absolute top-20 left-1/2 -translate-x-1/2 z-[5] w-[95%] max-w-[720px]">
+    <div className="absolute top-20 left-1/2 -translate-x-1/2 z-20 w-[95%] max-w-[720px]">
       <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl backdrop-blur-[24px] backdrop-saturate-[180%] shadow-[0_8px_32px_rgba(0,0,0,0.3)] ${
         dark
           ? "bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.12)]"
           : "bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.25)]"
       }`}>
-        <span className={`text-lg ${dark ? "text-[rgba(255,255,255,0.3)]" : "text-[rgba(0,0,0,0.3)]"}`}>⌕</span>
+        <svg className={`w-5 h-5 shrink-0 ${dark ? "text-[rgba(255,255,255,0.4)]" : "text-[rgba(0,0,0,0.4)]"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
         <input
           type="text"
           value={query}
@@ -82,18 +114,43 @@ function SearchBar({ onNavigate, dark }: { onNavigate: (lat: number, lng: number
           }`}
         />
       </div>
-      {isOpen && (
-        <div className="mt-2 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.1)] bg-[rgba(10,10,12,0.95)] backdrop-blur-[24px]">
-          {results.map((r, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => selectResult(r)}
-              className="w-full text-left px-5 py-3 text-[13px] text-[rgba(255,255,255,0.7)] hover:bg-[rgba(255,255,255,0.08)] border-b border-[rgba(255,255,255,0.06)] last:border-b-0 transition-colors"
-            >
-              {r.display_name}
-            </button>
-          ))}
+      {isOpen && hasResults && (
+        <div className="mt-2 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.1)] bg-[rgba(10,10,12,0.95)] backdrop-blur-[24px] max-h-[60vh] overflow-y-auto">
+          {matchedCourts.length > 0 && (
+            <>
+              <div className="px-5 pt-3 pb-1.5 text-[10px] font-semibold uppercase tracking-[1.5px] text-[rgba(255,255,255,0.3)]">Courts</div>
+              {matchedCourts.map((court) => (
+                <button
+                  key={court.id}
+                  type="button"
+                  onClick={() => selectCourt(court)}
+                  className="w-full text-left px-5 py-3 flex items-center gap-3 text-[13px] text-[rgba(255,255,255,0.85)] hover:bg-[rgba(255,255,255,0.08)] border-b border-[rgba(255,255,255,0.06)] last:border-b-0 transition-colors"
+                >
+                  <span className="text-[16px]">🏀</span>
+                  <span>
+                    <span className="font-medium">{court.name}</span>
+                    <span className="text-[11px] text-[rgba(255,255,255,0.35)] ml-2">{court.address}</span>
+                  </span>
+                </button>
+              ))}
+            </>
+          )}
+          {results.length > 0 && (
+            <>
+              <div className="px-5 pt-3 pb-1.5 text-[10px] font-semibold uppercase tracking-[1.5px] text-[rgba(255,255,255,0.3)]">Locations</div>
+              {results.map((r, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => selectResult(r)}
+                  className="w-full text-left px-5 py-3 flex items-center gap-3 text-[13px] text-[rgba(255,255,255,0.6)] hover:bg-[rgba(255,255,255,0.08)] border-b border-[rgba(255,255,255,0.06)] last:border-b-0 transition-colors"
+                >
+                  <span className="text-[14px]">📍</span>
+                  <span>{r.display_name}</span>
+                </button>
+              ))}
+            </>
+          )}
         </div>
       )}
     </div>
@@ -108,8 +165,8 @@ function CourtTooltipCard({ court }: { court: Court }) {
       <div style={{ position: "relative", height: 280, overflow: "hidden", margin: 0, padding: 0, lineHeight: 0, background: "#333" }}>
         <img src="/assets/basketball-pin.png" alt="" style={{ width: "130%", height: "130%", objectFit: "cover", display: "block", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", imageRendering: "pixelated" as any }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(12,12,14,0.95) 0%, rgba(12,12,14,0.3) 40%, transparent 70%)" }} />
-        <div style={{ position: "absolute", top: 14, left: 16, fontSize: 13, fontWeight: 600, color: "#d4a012", background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)", padding: "5px 12px", borderRadius: 10, display: "flex", alignItems: "center", gap: 5 }}>
-          ★ {court.rating} <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>({court.reviewCount})</span>
+        <div style={{ position: "absolute", top: 14, left: 16, fontSize: 16, fontWeight: 700, color: "#d4a012", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(12px)", padding: "8px 16px", borderRadius: 12, display: "flex", alignItems: "center", gap: 6, border: "1px solid rgba(212,160,18,0.25)" }}>
+          ★ {court.rating} <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, fontWeight: 500 }}>({court.reviewCount})</span>
         </div>
         <div style={{ position: "absolute", bottom: 18, left: 24, right: 24, fontSize: 18, fontWeight: 700, color: "white", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Lixdu', sans-serif", lineHeight: 1.3 }}>
           {court.name}
@@ -178,11 +235,14 @@ function TooltipListener({ onChange }: { onChange: (open: boolean) => void }) {
   return null;
 }
 
-function MapNavigator({ target }: { target: [number, number] | null }) {
+function MapNavigator({ target, onDone }: { target: [number, number] | null; onDone: () => void }) {
   const map = useMap();
   useEffect(() => {
-    if (target) map.flyTo(target, 15, { duration: 1.5 });
-  }, [target, map]);
+    if (!target) return;
+    map.flyTo(target, 15, { duration: 1.5 });
+    map.once("moveend", onDone);
+    return () => { map.off("moveend", onDone); };
+  }, [target, map, onDone]);
   return null;
 }
 
@@ -231,6 +291,7 @@ export default function Discover() {
   const [flyTarget, setFlyTarget] = useState<[number, number] | null>(null);
   const [tileStyle, setTileStyle] = useState<TileStyle>("dark");
   const [tooltipOpen, setTooltipOpen] = useState(false);
+  const [flying, setFlying] = useState(false);
 
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [geoReady, setGeoReady] = useState(false);
@@ -251,14 +312,20 @@ export default function Discover() {
   const center = useMemo(() => userLocation ?? mapCenter(courts), [userLocation, courts]);
   const isDark = isDarkTile(tileStyle);
   const userIcon = useMemo(() => userLocationIcon(), []);
+  const stopFlying = useCallback(() => setFlying(false), []);
   const handleNavigate = useCallback(
-    (lat: number, lng: number) => setFlyTarget([lat, lng]),
+    (lat: number, lng: number) => {
+      setFlying(true);
+      setFlyTarget([lat, lng]);
+    },
     [],
   );
   const handleDiscover = useCallback(() => {
     const origin = userLocation ?? center;
     const bounds = findNearestClusterBounds(origin, courts);
+    setFlying(true);
     mapRef.current?.flyToBounds(bounds, { padding: [50, 50], duration: 1.5 });
+    mapRef.current?.once("moveend", () => setFlying(false));
   }, [userLocation, center, courts]);
 
   // Always mounted — hide when not on home route
@@ -272,7 +339,9 @@ export default function Discover() {
 
   if (!geoReady) {
     return (
-      <div className="relative w-screen h-screen overflow-hidden bg-[#1a1a1e]" style={{ display: isVisible ? undefined : "none" }} />
+      <div className="relative w-screen h-screen overflow-hidden bg-[#1a1a1e] flex items-center justify-center" style={{ display: isVisible ? undefined : "none" }}>
+        <span className="text-[64px] animate-ball-spin">🏀</span>
+      </div>
     );
   }
 
@@ -289,7 +358,7 @@ export default function Discover() {
         >
           <TileLayer key={tileStyle} url={TILE_STYLES[tileStyle].url} />
           <TooltipListener onChange={setTooltipOpen} />
-          <MapNavigator target={flyTarget} />
+          <MapNavigator target={flyTarget} onDone={stopFlying} />
           <MapRef onMap={handleMapRef} />
           {courts.map((court) => (
             <CourtMarker key={court.id} court={court} />
@@ -301,7 +370,7 @@ export default function Discover() {
       </div>
 
       <Header user={user} onLogout={logout} tileStyle={tileStyle} />
-      {!tooltipOpen && <SearchBar onNavigate={handleNavigate} dark={isDark} />}
+      {!tooltipOpen && <SearchBar onNavigate={handleNavigate} onCourtSelect={(court) => handleNavigate(court.lat, court.lng)} dark={isDark} courts={courts} />}
       {!tooltipOpen && (
         <button
           type="button"
@@ -322,6 +391,12 @@ export default function Discover() {
       )}
       <ShotClockRow sessions={sessions} courts={courts} />
       <MapStyleSwitcher active={tileStyle} onChange={setTileStyle} />
+
+      {flying && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.4)] backdrop-blur-[4px]">
+          <span className="text-[64px] animate-ball-spin">🏀</span>
+        </div>
+      )}
     </div>
   );
 }

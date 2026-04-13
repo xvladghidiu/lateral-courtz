@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { PublicUser } from "@shared/types/index.js";
 import { type TileStyle, isDarkTile } from "../pages/Discover.js";
@@ -35,30 +36,44 @@ function NavLink({ dark }: { dark: boolean }) {
   );
 }
 
-function UserAvatar({ name, onLogout }: { name: string; onLogout: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onLogout}
-      className="w-8 h-8 rounded-full bg-linear-to-br from-accent-red to-accent-orange flex items-center justify-center text-[11px] font-semibold text-white shadow-[0_2px_8px_rgba(255,59,48,0.25)]"
-      aria-label="User menu"
-    >
-      {name.charAt(0).toUpperCase()}
-    </button>
-  );
-}
-
 export default function Header({ user, onLogout, tileStyle }: HeaderProps) {
   const dark = isDarkTile(tileStyle);
   const color = BRAND_COLORS[tileStyle];
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <header className="absolute top-0 left-0 right-0 z-30 flex items-center justify-end px-5 h-14 pointer-events-none">
       <VerticalLabel side="left" text="Lateral" color={color} />
       <VerticalLabel side="right" text="Courtz" color={color} />
       <div className="flex items-center gap-5 pointer-events-auto">
-        <NavLink dark={dark} />
-        {user && <UserAvatar name={user.name} onLogout={onLogout} />}
+        {!menuOpen && <NavLink dark={dark} />}
+        {user && (
+          <div className="flex items-center">
+            {menuOpen && (
+              <button
+                type="button"
+                onClick={() => { setMenuOpen(false); onLogout(); }}
+                className="flex items-center gap-2 px-5 py-2.5 mr-3 rounded-full bg-[rgba(12,12,14,0.9)] backdrop-blur-[16px] border border-[rgba(255,255,255,0.1)] whitespace-nowrap animate-fade-in-up"
+                style={{ animationDuration: "0.25s" }}
+              >
+                <span className="font-['Space_Grotesk',sans-serif] text-[11px] uppercase tracking-[2px] text-[rgba(255,255,255,0.7)]">
+                  Log Out
+                </span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setMenuOpen((prev) => !prev)}
+              className="relative w-11 h-11 flex items-center justify-center"
+              aria-label="User menu"
+            >
+              <span className={`text-[36px] select-none ${menuOpen ? "animate-ball-roll" : ""}`}>🏀</span>
+              <span className="absolute inset-0 flex items-center justify-center font-['Lixdu',sans-serif] text-[13px] text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+                {user.name.charAt(0).toUpperCase()}
+              </span>
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );
