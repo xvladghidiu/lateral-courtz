@@ -3,15 +3,21 @@ import { Link } from "react-router-dom";
 import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-const SECTION_DOT = "absolute -left-[29px] top-[3px] w-[14px] h-[14px] rounded-full bg-[rgba(212,160,18,0.3)] border-2 border-[#d4a012]";
+const SECTION_DOT =
+  "absolute -left-[29px] top-[3px] w-[14px] h-[14px] rounded-full bg-[rgba(212,160,18,0.3)] border-2 border-[#d4a012]";
 const SECTION_TITLE = "font-['Lixdu',sans-serif] text-[20px] uppercase tracking-[3px] text-white mb-4";
 const CARD = "bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-xl p-5 mb-4";
-const CODE_BLOCK = "bg-[rgba(0,0,0,0.4)] border border-[rgba(255,255,255,0.08)] rounded-lg p-4 font-mono text-[13px] text-[rgba(255,255,255,0.8)] overflow-x-auto whitespace-pre";
-const LABEL = "font-['Space_Grotesk',sans-serif] text-[10px] font-semibold uppercase tracking-[1.5px] text-[rgba(255,255,255,0.4)] mb-2";
+const CODE_BLOCK =
+  "bg-[rgba(0,0,0,0.4)] border border-[rgba(255,255,255,0.08)] rounded-lg p-4 font-mono text-[13px] text-[rgba(255,255,255,0.8)] overflow-x-auto whitespace-pre";
+const LABEL =
+  "font-['Space_Grotesk',sans-serif] text-[10px] font-semibold uppercase tracking-[1.5px] text-[rgba(255,255,255,0.4)] mb-2";
 const BODY = "font-['Space_Grotesk',sans-serif] text-[13px] text-[rgba(255,255,255,0.6)] leading-relaxed";
-const PILL = "inline-block bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.1)] rounded-full px-3 py-1 font-['Space_Grotesk',sans-serif] text-[10px] uppercase tracking-[1px] text-[rgba(255,255,255,0.6)]";
-const TABLE_HEAD = "font-['Space_Grotesk',sans-serif] text-[10px] font-semibold uppercase tracking-[1.5px] text-[rgba(255,255,255,0.4)] text-left pb-2 border-b border-[rgba(255,255,255,0.08)]";
-const TABLE_CELL = "font-['Space_Grotesk',sans-serif] text-[12px] text-[rgba(255,255,255,0.7)] py-2.5 border-b border-[rgba(255,255,255,0.06)]";
+const PILL =
+  "inline-block bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.1)] rounded-full px-3 py-1 font-['Space_Grotesk',sans-serif] text-[10px] uppercase tracking-[1px] text-[rgba(255,255,255,0.6)]";
+const TABLE_HEAD =
+  "font-['Space_Grotesk',sans-serif] text-[10px] font-semibold uppercase tracking-[1.5px] text-[rgba(255,255,255,0.4)] text-left pb-2 border-b border-[rgba(255,255,255,0.08)]";
+const TABLE_CELL =
+  "font-['Space_Grotesk',sans-serif] text-[12px] text-[rgba(255,255,255,0.7)] py-2.5 border-b border-[rgba(255,255,255,0.06)]";
 const TABLE_CODE = "font-mono text-[12px] text-[rgba(255,255,255,0.8)]";
 
 const NAV_SECTIONS = [
@@ -53,7 +59,17 @@ function FeatureCard({ title, description, details }: { title: string; descripti
   );
 }
 
-function EndpointRow({ method, path, description, auth }: { method: string; path: string; description: string; auth?: boolean }) {
+function EndpointRow({
+  method,
+  path,
+  description,
+  auth,
+}: {
+  method: string;
+  path: string;
+  description: string;
+  auth?: boolean;
+}) {
   const methodColor = method === "GET" ? "text-[rgba(100,220,140,0.8)]" : "text-[rgba(255,200,100,0.8)]";
   return (
     <tr>
@@ -109,7 +125,11 @@ function SideNav({ active }: { active: string }) {
       <Link
         to="/"
         className="mt-4 text-center text-white rounded-xl px-4 py-3 font-['Lixdu',sans-serif] text-[11px] uppercase tracking-[2px] hover:shadow-[0_4px_20px_rgba(232,120,23,0.4)] transition-all no-underline"
-        style={{ backgroundImage: "url(/assets/basketball-leather.jpg)", backgroundSize: "cover", backgroundPosition: "center" }}
+        style={{
+          backgroundImage: "url(/assets/basketball-leather.jpg)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
       >
         Back to Courts
       </Link>
@@ -156,11 +176,7 @@ export default function Docs() {
 
       <SideNav active={activeSection} />
 
-      <div
-        ref={contentRef}
-        onScroll={handleScroll}
-        className="relative z-[2] h-full overflow-y-auto lg:ml-[220px]"
-      >
+      <div ref={contentRef} onScroll={handleScroll} className="relative z-[2] h-full overflow-y-auto lg:ml-[220px]">
         <div className="max-w-[860px] mx-auto px-4 md:px-8 pt-6 pb-20">
           <Link
             to="/"
@@ -227,17 +243,28 @@ AUTO_CANCEL_OFFSET_HOURS=2         # Auto-confirm offset`}</div>
               <div className={CARD}>
                 <div className={LABEL}>Seed Data</div>
                 <p className={`${BODY} mb-3`}>
-                  No database required. The server uses in-memory repositories seeded automatically from JSON files on startup:
+                  No database required. The server uses in-memory repositories seeded automatically from JSON files on
+                  startup:
                 </p>
                 <ul className="list-none space-y-1.5">
-                  <li className={`${BODY} flex items-start gap-2`}><span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span><code className="text-white">courts.json</code> — 16 courts across NYC and Cluj-Napoca</li>
-                  <li className={`${BODY} flex items-start gap-2`}><span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span><code className="text-white">users.json</code> — Pre-seeded user accounts</li>
-                  <li className={`${BODY} flex items-start gap-2`}><span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span><code className="text-white">sessions.json</code> — Sample game sessions</li>
-                  <li className={`${BODY} flex items-start gap-2`}><span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span><code className="text-white">reviews.json</code> — Sample reviews</li>
+                  <li className={`${BODY} flex items-start gap-2`}>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>
+                    <code className="text-white">courts.json</code> — 16 courts across NYC and Cluj-Napoca
+                  </li>
+                  <li className={`${BODY} flex items-start gap-2`}>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>
+                    <code className="text-white">users.json</code> — Pre-seeded user accounts
+                  </li>
+                  <li className={`${BODY} flex items-start gap-2`}>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>
+                    <code className="text-white">sessions.json</code> — Sample game sessions
+                  </li>
+                  <li className={`${BODY} flex items-start gap-2`}>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>
+                    <code className="text-white">reviews.json</code> — Sample reviews
+                  </li>
                 </ul>
-                <p className={`${BODY} mt-3`}>
-                  Data resets on server restart. No seed commands needed.
-                </p>
+                <p className={`${BODY} mt-3`}>Data resets on server restart. No seed commands needed.</p>
               </div>
 
               <div className={CARD}>
@@ -245,7 +272,42 @@ AUTO_CANCEL_OFFSET_HOURS=2         # Auto-confirm offset`}</div>
                 <div className={CODE_BLOCK}>{`npm run build        # Production build (server + client)
 npm test             # Run all tests (Vitest)
 npm run typecheck    # Type-check both packages
-npm run lint         # Lint all .ts/.tsx files`}</div>
+npm run lint         # Lint all .ts/.tsx files
+npm run format       # Format all files with Prettier
+npm run format:check # Check formatting without writing`}</div>
+              </div>
+
+              <div className={CARD}>
+                <div className={LABEL}>Pre-commit Hooks</div>
+                <p className={`${BODY} mb-3`}>
+                  Every commit automatically runs Prettier formatting on staged files and executes all unit tests via
+                  Husky + lint-staged.
+                </p>
+                <ul className="list-none space-y-1.5">
+                  <li className={`${BODY} flex items-start gap-2`}>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>
+                    <strong className="text-white">Prettier</strong> — auto-formats staged .ts, .tsx, .json, .css, .md
+                    files on commit
+                  </li>
+                  <li className={`${BODY} flex items-start gap-2`}>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>
+                    <strong className="text-white">Unit Tests</strong> — all tests must pass before the commit is
+                    allowed (31 tests across server + client)
+                  </li>
+                  <li className={`${BODY} flex items-start gap-2`}>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>
+                    <strong className="text-white">Husky</strong> — manages Git hooks, initialized via{" "}
+                    <code className="text-white">npm run prepare</code>
+                  </li>
+                  <li className={`${BODY} flex items-start gap-2`}>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>
+                    <strong className="text-white">lint-staged</strong> — only runs Prettier on files that are staged
+                    for commit (fast)
+                  </li>
+                </ul>
+                <div className={`${CODE_BLOCK} mt-3`}>{`# Pre-commit hook runs:
+npx lint-staged    # Prettier on staged files
+npm test           # All unit tests`}</div>
               </div>
             </Section>
 
@@ -472,7 +534,9 @@ npm run lint         # Lint all .ts/.tsx files`}</div>
                     <p className={BODY}>Fullscreen spinner while fetching court data</p>
                   </div>
                   <div className="bg-[rgba(0,0,0,0.3)] rounded-lg p-4 text-center">
-                    <div className="font-['Lixdu',sans-serif] text-[12px] uppercase tracking-[2px] text-[rgba(255,255,255,0.5)] mb-2">Processing...</div>
+                    <div className="font-['Lixdu',sans-serif] text-[12px] uppercase tracking-[2px] text-[rgba(255,255,255,0.5)] mb-2">
+                      Processing...
+                    </div>
                     <div className={LABEL}>Payment Processing</div>
                     <p className={BODY}>1.5s simulated delay on Pay button</p>
                   </div>
@@ -490,15 +554,42 @@ npm run lint         # Lint all .ts/.tsx files`}</div>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr><td className={`${TABLE_CELL} font-medium text-white`}>404 Route</td><td className={TABLE_CELL}>Basketball emoji + "This court doesn't exist... yet" + leather CTA</td></tr>
-                    <tr><td className={`${TABLE_CELL} font-medium text-white`}>Court Not Found</td><td className={TABLE_CELL}>Basketball + "Not Found" title + "Back to Courts" button</td></tr>
-                    <tr><td className={`${TABLE_CELL} font-medium text-white`}>Location Denied</td><td className={TABLE_CELL}>"Please enable your location" message, auto-fly to nearest cluster</td></tr>
-                    <tr><td className={`${TABLE_CELL} font-medium text-white`}>Location Granted Later</td><td className={TABLE_CELL}>PermissionStatus listener auto-updates without refresh</td></tr>
-                    <tr><td className={`${TABLE_CELL} font-medium text-white`}>Network Error (Search)</td><td className={TABLE_CELL}>Silent catch, keeps showing local court matches</td></tr>
-                    <tr><td className={`${TABLE_CELL} font-medium text-white`}>Invalid Card</td><td className={TABLE_CELL}>Red border on blur, Pay button disabled until all fields valid</td></tr>
-                    <tr><td className={`${TABLE_CELL} font-medium text-white`}>Empty Bookings</td><td className={TABLE_CELL}>Spinning basketball + message + "Explore Courts" CTA</td></tr>
-                    <tr><td className={`${TABLE_CELL} font-medium text-white`}>No Photos</td><td className={TABLE_CELL}>Carousel hidden, court details still render</td></tr>
-                    <tr><td className={`${TABLE_CELL} font-medium text-white`}>Not Authenticated</td><td className={TABLE_CELL}>Redirect to /login with return-to path preserved</td></tr>
+                    <tr>
+                      <td className={`${TABLE_CELL} font-medium text-white`}>404 Route</td>
+                      <td className={TABLE_CELL}>Basketball emoji + "This court doesn't exist... yet" + leather CTA</td>
+                    </tr>
+                    <tr>
+                      <td className={`${TABLE_CELL} font-medium text-white`}>Court Not Found</td>
+                      <td className={TABLE_CELL}>Basketball + "Not Found" title + "Back to Courts" button</td>
+                    </tr>
+                    <tr>
+                      <td className={`${TABLE_CELL} font-medium text-white`}>Location Denied</td>
+                      <td className={TABLE_CELL}>"Please enable your location" message, auto-fly to nearest cluster</td>
+                    </tr>
+                    <tr>
+                      <td className={`${TABLE_CELL} font-medium text-white`}>Location Granted Later</td>
+                      <td className={TABLE_CELL}>PermissionStatus listener auto-updates without refresh</td>
+                    </tr>
+                    <tr>
+                      <td className={`${TABLE_CELL} font-medium text-white`}>Network Error (Search)</td>
+                      <td className={TABLE_CELL}>Silent catch, keeps showing local court matches</td>
+                    </tr>
+                    <tr>
+                      <td className={`${TABLE_CELL} font-medium text-white`}>Invalid Card</td>
+                      <td className={TABLE_CELL}>Red border on blur, Pay button disabled until all fields valid</td>
+                    </tr>
+                    <tr>
+                      <td className={`${TABLE_CELL} font-medium text-white`}>Empty Bookings</td>
+                      <td className={TABLE_CELL}>Spinning basketball + message + "Explore Courts" CTA</td>
+                    </tr>
+                    <tr>
+                      <td className={`${TABLE_CELL} font-medium text-white`}>No Photos</td>
+                      <td className={TABLE_CELL}>Carousel hidden, court details still render</td>
+                    </tr>
+                    <tr>
+                      <td className={`${TABLE_CELL} font-medium text-white`}>Not Authenticated</td>
+                      <td className={TABLE_CELL}>Redirect to /login with return-to path preserved</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -508,13 +599,19 @@ npm run lint         # Lint all .ts/.tsx files`}</div>
                 <div className="bg-[rgba(0,0,0,0.4)] rounded-xl p-8 mt-3 border border-[rgba(255,255,255,0.06)]">
                   <div className="flex flex-col items-center text-center">
                     <span className="text-[56px] animate-ball-spin mb-4">🏀</span>
-                    <div className="font-['Lixdu',sans-serif] text-[36px] uppercase tracking-[6px] text-white mb-2">404</div>
+                    <div className="font-['Lixdu',sans-serif] text-[36px] uppercase tracking-[6px] text-white mb-2">
+                      404
+                    </div>
                     <p className="font-['Space_Grotesk',sans-serif] text-[13px] text-[rgba(255,255,255,0.4)] tracking-[1px] mb-6">
                       This court doesn't exist... yet.
                     </p>
                     <div
                       className="text-white rounded-xl px-6 py-3 font-['Lixdu',sans-serif] text-[12px] uppercase tracking-[2px]"
-                      style={{ backgroundImage: "url(/assets/basketball-leather.jpg)", backgroundSize: "cover", backgroundPosition: "center" }}
+                      style={{
+                        backgroundImage: "url(/assets/basketball-leather.jpg)",
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }}
                     >
                       Back to Courts
                     </div>
@@ -527,13 +624,19 @@ npm run lint         # Lint all .ts/.tsx files`}</div>
                 <div className="bg-[rgba(0,0,0,0.4)] rounded-xl p-8 mt-3 border border-[rgba(255,255,255,0.06)]">
                   <div className="flex flex-col items-center text-center">
                     <span className="text-[56px] mb-4">🏀</span>
-                    <div className="font-['Lixdu',sans-serif] text-[28px] uppercase tracking-[4px] text-white mb-2">Not Found</div>
+                    <div className="font-['Lixdu',sans-serif] text-[28px] uppercase tracking-[4px] text-white mb-2">
+                      Not Found
+                    </div>
                     <p className="font-['Space_Grotesk',sans-serif] text-[13px] text-[rgba(255,255,255,0.4)] tracking-[1px] mb-6">
                       This court doesn't exist
                     </p>
                     <div
                       className="text-white rounded-xl px-6 py-3 font-['Lixdu',sans-serif] text-[12px] uppercase tracking-[2px]"
-                      style={{ backgroundImage: "url(/assets/basketball-leather.jpg)", backgroundSize: "cover", backgroundPosition: "center" }}
+                      style={{
+                        backgroundImage: "url(/assets/basketball-leather.jpg)",
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }}
                     >
                       Back to Courts
                     </div>
@@ -593,8 +696,12 @@ npm run lint         # Lint all .ts/.tsx files`}</div>
                     ["Nominatim", "Geocoding"],
                   ].map(([name, role]) => (
                     <div key={name} className="bg-[rgba(0,0,0,0.3)] rounded-lg px-4 py-3">
-                      <div className="font-['Lixdu',sans-serif] text-[11px] uppercase tracking-[1.5px] text-white">{name}</div>
-                      <div className="font-['Space_Grotesk',sans-serif] text-[10px] text-[rgba(255,255,255,0.4)] mt-0.5">{role}</div>
+                      <div className="font-['Lixdu',sans-serif] text-[11px] uppercase tracking-[1.5px] text-white">
+                        {name}
+                      </div>
+                      <div className="font-['Space_Grotesk',sans-serif] text-[10px] text-[rgba(255,255,255,0.4)] mt-0.5">
+                        {role}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -602,7 +709,9 @@ npm run lint         # Lint all .ts/.tsx files`}</div>
             </Section>
 
             <Section id="data-model" title="Data Model">
-              <TypeBlock name="Court" fields={`{
+              <TypeBlock
+                name="Court"
+                fields={`{
   id: string
   name: string
   address: string
@@ -614,8 +723,11 @@ npm run lint         # Lint all .ts/.tsx files`}</div>
   pricePerPlayerPerHour: number
   rating: number
   reviewCount: number
-}`} />
-              <TypeBlock name="Session" fields={`{
+}`}
+              />
+              <TypeBlock
+                name="Session"
+                fields={`{
   id: string
   courtId: string
   createdBy: string
@@ -628,23 +740,30 @@ npm run lint         # Lint all .ts/.tsx files`}</div>
   players: string[]
   status: "filling" | "confirmed" | "cancelled" | "completed"
   autoConfirmDeadline: string
-}`} />
-              <TypeBlock name="Booking" fields={`{
+}`}
+              />
+              <TypeBlock
+                name="Booking"
+                fields={`{
   id: string
   sessionId: string
   userId: string
   amountPaid: number
   status: "confirmed" | "cancelled"
   createdAt: string
-}`} />
-              <TypeBlock name="Review" fields={`{
+}`}
+              />
+              <TypeBlock
+                name="Review"
+                fields={`{
   id: string
   courtId: string
   userId: string
   rating: number        // 1-5
   comment: string
   createdAt: string
-}`} />
+}`}
+              />
             </Section>
 
             <Section id="project-structure" title="Project Structure">
@@ -677,7 +796,11 @@ npm run lint         # Lint all .ts/.tsx files`}</div>
             <Link
               to="/"
               className="inline-block text-white rounded-xl px-8 py-4 font-['Lixdu',sans-serif] text-[14px] uppercase tracking-[2.5px] hover:shadow-[0_4px_20px_rgba(232,120,23,0.4)] transition-all no-underline"
-              style={{ backgroundImage: "url(/assets/basketball-leather.jpg)", backgroundSize: "cover", backgroundPosition: "center" }}
+              style={{
+                backgroundImage: "url(/assets/basketball-leather.jpg)",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
             >
               Back to Courts
             </Link>
