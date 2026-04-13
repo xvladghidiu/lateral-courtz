@@ -17,6 +17,13 @@
 }
 
 @font-face {
+  font-family: "Grize Sports";
+  src: url("/assets/fonts/GrizeSportsDemo-Regular.otf") format("opentype");
+  font-weight: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: "DSEG";
   src: url("https://cdn.jsdelivr.net/npm/dseg@0.46.0/fonts/DSEG7-Classic/DSEG7Classic-Bold.woff2") format("woff2");
   font-weight: bold;

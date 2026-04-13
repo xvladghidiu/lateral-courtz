@@ -7,6 +7,7 @@ import Register from "./pages/Register.js";
 import CourtDetails from "./pages/CourtDetails.js";
 import CreateSession from "./pages/CreateSession.js";
 import Dashboard from "./pages/Dashboard.js";
+import NotFound from "./pages/NotFound.js";
 import BottomTabs from "./components/BottomTabs.js";
 
 const queryClient = new QueryClient({
@@ -21,12 +22,14 @@ export default function App() {
           {/* Discover is always mounted — hides itself when not on "/" */}
           <Discover />
           <Routes>
+            <Route path="/" element={null} />
             <Route path="/courts/:id" element={<CourtDetails />} />
             <Route path="/sessions/new" element={<CreateSession />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/bookings" element={<Dashboard />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
           <BottomTabs />
         </BrowserRouter>

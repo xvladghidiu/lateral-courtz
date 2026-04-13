@@ -8,7 +8,6 @@ import { useCourts } from "../hooks/useCourts.js";
 import { useAllSessions } from "../hooks/useSessions.js";
 import { useAuth } from "../context/AuthContext.js";
 import Header from "../components/Header.js";
-import ShotClockRow from "../components/ShotClockRow.js";
 import { mapCenter, courtIcon, getUserLocation, findNearestClusterBounds, userLocationIcon } from "../lib/mapUtils.js";
 
 const TILE_STYLES = {
@@ -161,34 +160,29 @@ function SearchBar({ onNavigate, onCourtSelect, dark, courts }: { onNavigate: (l
 
 function CourtTooltipCard({ court }: { court: Court }) {
   return (
-    <div style={{ width: 640, borderRadius: 24, overflow: "hidden", background: "rgba(12,12,14,0.94)", backdropFilter: "blur(32px)", boxShadow: "0 20px 64px rgba(0,0,0,0.6)", fontFamily: "'Space Grotesk', sans-serif", border: "1px solid rgba(255,255,255,0.1)" }}>
-      <div style={{ position: "relative", height: 280, overflow: "hidden", margin: 0, padding: 0, lineHeight: 0, background: "#333" }}>
+    <div style={{ width: 420, borderRadius: 16, overflow: "hidden", background: "rgba(12,12,14,0.94)", backdropFilter: "blur(32px)", boxShadow: "0 12px 40px rgba(0,0,0,0.6)", fontFamily: "'Space Grotesk', sans-serif", border: "1px solid rgba(255,255,255,0.1)" }}>
+      <div style={{ position: "relative", height: 140, overflow: "hidden", margin: 0, padding: 0, lineHeight: 0, background: "#333" }}>
         <img src="/assets/basketball-pin.png" alt="" style={{ width: "130%", height: "130%", objectFit: "cover", display: "block", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", imageRendering: "pixelated" as any }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(12,12,14,0.95) 0%, rgba(12,12,14,0.3) 40%, transparent 70%)" }} />
-        <div style={{ position: "absolute", top: 14, left: 16, fontSize: 16, fontWeight: 700, color: "#d4a012", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(12px)", padding: "8px 16px", borderRadius: 12, display: "flex", alignItems: "center", gap: 6, border: "1px solid rgba(212,160,18,0.25)" }}>
-          ★ {court.rating} <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, fontWeight: 500 }}>({court.reviewCount})</span>
-        </div>
-        <div style={{ position: "absolute", bottom: 18, left: 24, right: 24, fontSize: 18, fontWeight: 700, color: "white", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Lixdu', sans-serif", lineHeight: 1.3 }}>
-          {court.name}
+        <div style={{ position: "absolute", top: 10, left: 12, fontSize: 13, fontWeight: 700, color: "#d4a012", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(12px)", padding: "5px 10px", borderRadius: 8, display: "flex", alignItems: "center", gap: 4, border: "1px solid rgba(212,160,18,0.25)" }}>
+          ★ {court.rating} <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 11, fontWeight: 500 }}>({court.reviewCount})</span>
         </div>
       </div>
-      <div style={{ padding: "22px 24px 24px" }}>
-        <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+      <div style={{ padding: "14px 16px 16px" }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "white", letterSpacing: "1px", textTransform: "uppercase", fontFamily: "'Lixdu', sans-serif", lineHeight: 1.4, marginBottom: 10, wordBreak: "break-word" as const }}>
+          {court.name}
+        </div>
+        <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
           {[court.type, court.surface].map((label) => (
-            <span key={label} style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: "2px", color: "rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: "6px 14px" }}>
+            <span key={label} style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "1.5px", color: "rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "4px 10px" }}>
               {label}
             </span>
           ))}
         </div>
-        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.35)", marginBottom: 10 }}>{court.address}</div>
-        {court.amenities.length > 0 && (
-          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.25)", marginBottom: 16 }}>
-            {court.amenities.join(" · ")}
-          </div>
-        )}
+        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginBottom: 6 }}>{court.address}</div>
         <div>
-          <span style={{ fontFamily: "'DSEG', monospace", fontSize: 34, color: "rgba(255,255,255,0.9)" }}>${court.pricePerPlayerPerHour}</span>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", marginLeft: 6 }}>/ hr</span>
+          <span style={{ fontFamily: "'DSEG', monospace", fontSize: 24, color: "rgba(255,255,255,0.9)" }}>${court.pricePerPlayerPerHour}</span>
+          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginLeft: 4 }}>/ hr</span>
         </div>
       </div>
     </div>
@@ -307,11 +301,31 @@ export default function Discover() {
       .catch(() => {
         setGeoReady(true);
       });
+
+    if (!navigator.permissions) return;
+    let permStatus: PermissionStatus | null = null;
+    const onChange = () => {
+      if (permStatus?.state === "granted") {
+        getUserLocation().then(setUserLocation).catch(() => {});
+      }
+    };
+    navigator.permissions.query({ name: "geolocation" }).then((s) => {
+      permStatus = s;
+      s.addEventListener("change", onChange);
+    });
+    return () => {
+      permStatus?.removeEventListener("change", onChange);
+    };
   }, []);
 
-  const center = useMemo(() => userLocation ?? mapCenter(courts), [userLocation, courts]);
+  const center = useMemo((): [number, number] => {
+    if (userLocation) return userLocation;
+    if (courts.length) return [courts[0]!.lat, courts[0]!.lng];
+    return mapCenter(courts);
+  }, [userLocation, courts]);
   const isDark = isDarkTile(tileStyle);
   const userIcon = useMemo(() => userLocationIcon(), []);
+  const playingNow = useMemo(() => sessions.reduce((sum, s) => sum + s.players.length, 0), [sessions]);
   const stopFlying = useCallback(() => setFlying(false), []);
   const handleNavigate = useCallback(
     (lat: number, lng: number) => {
@@ -336,6 +350,18 @@ export default function Discover() {
     const timer = setTimeout(() => mapRef.current?.invalidateSize(), 50);
     return () => clearTimeout(timer);
   }, [isVisible]);
+
+  const autoFlewRef = useRef(false);
+  useEffect(() => {
+    if (autoFlewRef.current || userLocation || !geoReady || !courts.length || !mapRef.current) return;
+    autoFlewRef.current = true;
+    const origin: [number, number] = [courts[0]!.lat, courts[0]!.lng];
+    const bounds = findNearestClusterBounds(origin, courts);
+    const timer = setTimeout(() => {
+      mapRef.current?.flyToBounds(bounds, { padding: [50, 50], duration: 1.5 });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [geoReady, userLocation, courts]);
 
   if (!geoReady) {
     return (
@@ -371,25 +397,38 @@ export default function Discover() {
 
       <Header user={user} onLogout={logout} tileStyle={tileStyle} />
       {!tooltipOpen && <SearchBar onNavigate={handleNavigate} onCourtSelect={(court) => handleNavigate(court.lat, court.lng)} dark={isDark} courts={courts} />}
-      {!tooltipOpen && (
-        <button
+      <button
           type="button"
           onClick={handleDiscover}
-          className={`group absolute top-[10.5rem] left-1/2 z-[5] flex items-center gap-2.5 pl-4 pr-5 py-2.5 rounded-full backdrop-blur-[24px] backdrop-saturate-[180%] shadow-[0_8px_24px_rgba(0,0,0,0.12),0_16px_48px_rgba(0,0,0,0.06)] animate-float transition-shadow duration-300 hover:shadow-[0_12px_32px_rgba(0,0,0,0.18),0_24px_60px_rgba(0,0,0,0.1)] active:scale-95 ${
-            isDark
-              ? "bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.14)]"
-              : "bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.25)] hover:bg-[rgba(255,255,255,0.25)]"
-          }`}
+          className="absolute bottom-20 left-1/2 -translate-x-1/2 z-[5] flex items-center gap-4 px-6 py-4 rounded-2xl border border-[rgba(255,255,255,0.1)] shadow-[0_4px_20px_rgba(232,120,23,0.3),0_8px_32px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_32px_rgba(232,120,23,0.4),0_12px_40px_rgba(0,0,0,0.4)] active:scale-[0.98] transition-all"
+          style={{ backgroundImage: "url(/assets/basketball-leather.jpg)", backgroundSize: "cover", backgroundPosition: "center" }}
         >
-          <span className="text-[18px] transition-transform duration-300 group-hover:rotate-[360deg]">🏀</span>
-          <span className={`font-['Space_Grotesk',sans-serif] text-[13px] uppercase tracking-[3px] ${
-            isDark ? "text-[rgba(255,255,255,0.8)]" : "text-[rgba(0,0,0,0.55)]"
-          }`}>
-            Discover
-          </span>
-        </button>
-      )}
-      <ShotClockRow sessions={sessions} courts={courts} />
+          <div className="flex-1 text-left">
+            <div className="font-['Lixdu',sans-serif] text-[14px] uppercase tracking-[2px] text-white">
+              Discover Courts
+            </div>
+            {userLocation ? (
+              <div className="flex items-center gap-4 mt-1">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="font-['DSEG',monospace] text-[20px] text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">{playingNow}</span>
+                  <span className="font-['Lixdu',sans-serif] text-[10px] uppercase tracking-[1.5px] text-[rgba(255,255,255,0.7)]">Playing</span>
+                </div>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="font-['DSEG',monospace] text-[20px] text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">{sessions.length}</span>
+                  <span className="font-['Lixdu',sans-serif] text-[10px] uppercase tracking-[1.5px] text-[rgba(255,255,255,0.7)]">Active</span>
+                </div>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="font-['DSEG',monospace] text-[20px] text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">{courts.length}</span>
+                  <span className="font-['Lixdu',sans-serif] text-[10px] uppercase tracking-[1.5px] text-[rgba(255,255,255,0.7)]">Courts</span>
+                </div>
+              </div>
+            ) : (
+              <div className="font-['Space_Grotesk',sans-serif] text-[11px] font-medium text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] mt-0.5">
+                Please enable your location for nearby courts
+              </div>
+            )}
+          </div>
+      </button>
       <MapStyleSwitcher active={tileStyle} onChange={setTileStyle} />
 
       {flying && (

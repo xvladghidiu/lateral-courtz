@@ -145,9 +145,7 @@ export default function CourtDetails() {
   if (courtLoading) {
     return (
       <FullScreenMessage>
-        <span className="font-['Space_Grotesk',sans-serif] text-[12px] uppercase tracking-[2px] text-[rgba(255,255,255,0.5)]">
-          Loading court...
-        </span>
+        <span className="text-[64px] animate-ball-spin">🏀</span>
       </FullScreenMessage>
     );
   }
@@ -155,9 +153,22 @@ export default function CourtDetails() {
   if (!court) {
     return (
       <FullScreenMessage>
-        <span className="font-['Space_Grotesk',sans-serif] text-[12px] uppercase tracking-[2px] text-[#ff3b30]">
-          Court not found
-        </span>
+        <div className="flex flex-col items-center">
+          <span className="text-[64px] mb-6">🏀</span>
+          <h1 className="font-['Lixdu',sans-serif] text-[36px] uppercase tracking-[4px] text-white mb-2">
+            Not Found
+          </h1>
+          <p className="font-['Space_Grotesk',sans-serif] text-[13px] text-[rgba(255,255,255,0.4)] tracking-[1px] mb-8">
+            This court doesn't exist
+          </p>
+          <Link
+            to="/"
+            className="text-white rounded-xl px-8 py-4 font-['Lixdu',sans-serif] text-[14px] uppercase tracking-[2.5px] hover:shadow-[0_4px_20px_rgba(232,120,23,0.4)] transition-all no-underline"
+            style={{ backgroundImage: "url(/assets/basketball-leather.jpg)", backgroundSize: "cover", backgroundPosition: "center" }}
+          >
+            Back to Courts
+          </Link>
+        </div>
       </FullScreenMessage>
     );
   }
