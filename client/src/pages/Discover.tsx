@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import L from "leaflet";
 import { MapContainer, TileLayer, Marker, Tooltip, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -430,6 +430,21 @@ export default function Discover() {
           </div>
       </button>
       <MapStyleSwitcher active={tileStyle} onChange={setTileStyle} />
+
+      <Link
+        to="/docs"
+        className="absolute bottom-20 left-5 z-[5] w-11 h-11 rounded-full bg-[rgba(12,12,14,0.8)] backdrop-blur-[16px] border border-[rgba(255,255,255,0.1)] flex items-center justify-center hover:bg-[rgba(255,255,255,0.15)] hover:border-[rgba(255,255,255,0.2)] hover:scale-110 transition-all"
+        aria-label="Documentation"
+      >
+        <svg className="w-6 h-6" viewBox="0 0 64 64" fill="none">
+          <rect x="12" y="6" width="40" height="30" rx="4" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="3" />
+          <rect x="20" y="14" width="24" height="14" rx="2" fill="rgba(232,120,23,0.4)" stroke="rgba(255,255,255,0.6)" strokeWidth="2" />
+          <line x1="22" y1="36" x2="42" y2="36" stroke="rgba(255,255,255,0.6)" strokeWidth="3" />
+          <path d="M26 36 L22 50 M38 36 L42 50 M22 50 L42 50" stroke="rgba(255,255,255,0.5)" strokeWidth="2" fill="none" />
+          <line x1="26" y1="44" x2="38" y2="44" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
+          <line x1="24" y1="47" x2="40" y2="47" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
+        </svg>
+      </Link>
 
       {flying && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.4)] backdrop-blur-[4px]">

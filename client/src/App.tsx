@@ -8,6 +8,7 @@ import CourtDetails from "./pages/CourtDetails.js";
 import CreateSession from "./pages/CreateSession.js";
 import Dashboard from "./pages/Dashboard.js";
 import NotFound from "./pages/NotFound.js";
+import Docs from "./pages/Docs.js";
 import BottomTabs from "./components/BottomTabs.js";
 
 const queryClient = new QueryClient({
@@ -29,6 +30,7 @@ export default function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/bookings" element={<Dashboard />} />
+            <Route path="/docs" element={<Docs />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <BottomTabs />
