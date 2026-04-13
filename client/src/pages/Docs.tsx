@@ -27,6 +27,7 @@ const NAV_SECTIONS = [
   { id: "loading-states", label: "Loading States" },
   { id: "error-handling", label: "Error Handling" },
   { id: "api-reference", label: "API Reference" },
+  { id: "ci-cd", label: "CI/CD" },
   { id: "tech-stack", label: "Tech Stack" },
   { id: "data-model", label: "Data Model" },
   { id: "project-structure", label: "Project Structure" },
@@ -675,6 +676,79 @@ npm test           # All unit tests`}</div>
                     </tbody>
                   </table>
                 </div>
+              </div>
+            </Section>
+
+            <Section id="ci-cd" title="CI/CD Pipeline">
+              <div className={CARD}>
+                <div className={LABEL}>GitHub Actions</div>
+                <p className={`${BODY} mb-3`}>
+                  Every push to <code className="text-white">main</code> and every pull request triggers the CI
+                  pipeline.
+                </p>
+                <div className={`${CODE_BLOCK} mb-4`}>{`# .github/workflows/ci.yml
+
+Jobs:
+1. test     — npm ci → typecheck → test → build
+2. deploy   — builds client → deploys to Vercel (main only)`}</div>
+
+                <div className={LABEL}>Test Job</div>
+                <ul className="list-none space-y-1.5 mb-4">
+                  <li className={`${BODY} flex items-start gap-2`}>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>Runs on{" "}
+                    <code className="text-white">ubuntu-latest</code> with Node 22
+                  </li>
+                  <li className={`${BODY} flex items-start gap-2`}>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>
+                    <code className="text-white">npm run typecheck</code> — TypeScript compilation check (server +
+                    client)
+                  </li>
+                  <li className={`${BODY} flex items-start gap-2`}>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>
+                    <code className="text-white">npm test</code> — 60 unit tests (29 server + 31 client)
+                  </li>
+                  <li className={`${BODY} flex items-start gap-2`}>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>
+                    <code className="text-white">npm run build</code> — production build (server + client)
+                  </li>
+                </ul>
+
+                <div className={LABEL}>Deploy Job</div>
+                <ul className="list-none space-y-1.5 mb-4">
+                  <li className={`${BODY} flex items-start gap-2`}>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>Only runs on{" "}
+                    <code className="text-white">main</code> branch pushes (not PRs)
+                  </li>
+                  <li className={`${BODY} flex items-start gap-2`}>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>Requires test job to pass first
+                  </li>
+                  <li className={`${BODY} flex items-start gap-2`}>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>Builds the client and deploys to
+                    Vercel via <code className="text-white">amondnet/vercel-action</code>
+                  </li>
+                </ul>
+
+                <div className={LABEL}>Required Secrets</div>
+                <div className={CODE_BLOCK}>{`VERCEL_TOKEN        # Vercel API token
+VERCEL_ORG_ID       # Vercel organization ID
+VERCEL_PROJECT_ID   # Vercel project ID`}</div>
+              </div>
+
+              <div className={CARD}>
+                <div className={LABEL}>Pre-commit Hooks (local)</div>
+                <p className={`${BODY} mb-3`}>Husky + lint-staged runs on every local commit before it reaches CI.</p>
+                <ul className="list-none space-y-1.5">
+                  <li className={`${BODY} flex items-start gap-2`}>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>
+                    <strong className="text-white">lint-staged</strong> — Prettier formats staged
+                    .ts/.tsx/.json/.css/.md files
+                  </li>
+                  <li className={`${BODY} flex items-start gap-2`}>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>
+                    <strong className="text-white">npm test</strong> — all 60 tests must pass before the commit is
+                    allowed
+                  </li>
+                </ul>
               </div>
             </Section>
 

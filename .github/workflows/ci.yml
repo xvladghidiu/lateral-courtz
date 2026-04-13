@@ -7,7 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  ci:
+  test:
+    name: Test & Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,5 +17,29 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run test -w server
+      - run: npx tsc -b shared
+      - run: npm run typecheck
+      - run: npm test
       - run: npm run build
+
+  deploy:
+    name: Deploy to Vercel
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx tsc -b shared
+      - run: npm run build -w client
+      - uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: --prod
+          working-directory: client
