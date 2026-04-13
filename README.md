@@ -4,15 +4,15 @@ A full-stack basketball court discovery and booking platform. Find nearby courts
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React 19, React Router v7, TanStack Query v5 |
-| Styling | Tailwind CSS v4, glass morphism design system |
-| Maps | Leaflet + react-leaflet (CartoDB tiles, Nominatim geocoding) |
-| Backend | Fastify 5, JWT auth, bcrypt |
-| Shared | TypeScript types across client and server |
-| Build | Vite, npm workspaces, concurrently |
-| Testing | Vitest, React Testing Library |
+| Layer    | Technology                                                   |
+| -------- | ------------------------------------------------------------ |
+| Frontend | React 19, React Router v7, TanStack Query v5                 |
+| Styling  | Tailwind CSS v4, glass morphism design system                |
+| Maps     | Leaflet + react-leaflet (CartoDB tiles, Nominatim geocoding) |
+| Backend  | Fastify 5, JWT auth, bcrypt                                  |
+| Shared   | TypeScript types across client and server                    |
+| Build    | Vite, npm workspaces, concurrently                           |
+| Testing  | Vitest, React Testing Library                                |
 
 ## Features
 
@@ -58,11 +58,11 @@ The Vite dev server proxies `/api` requests to the backend automatically.
 
 All optional — sensible defaults are built in.
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PORT` | `3001` | Server listen port |
-| `JWT_SECRET` | `lateral-courts-dev-secret-change-me` | JWT signing key (change in production) |
-| `AUTO_CANCEL_OFFSET_HOURS` | `2` | Hours before session start to auto-confirm |
+| Variable                   | Default                               | Description                                |
+| -------------------------- | ------------------------------------- | ------------------------------------------ |
+| `PORT`                     | `3001`                                | Server listen port                         |
+| `JWT_SECRET`               | `lateral-courts-dev-secret-change-me` | JWT signing key (change in production)     |
+| `AUTO_CANCEL_OFFSET_HOURS` | `2`                                   | Hours before session start to auto-confirm |
 
 ### Other Commands
 
@@ -75,20 +75,34 @@ npm run lint         # Lint all .ts/.tsx files
 
 ## API Overview
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/auth/register` | Create account |
-| `POST` | `/api/auth/login` | Get JWT token |
-| `GET` | `/api/auth/me` | Current user (auth required) |
-| `GET` | `/api/courts` | Search/list courts |
-| `GET` | `/api/courts/:id` | Court details |
-| `GET` | `/api/courts/:id/sessions` | Sessions for a court |
-| `GET` | `/api/courts/:id/reviews` | Reviews for a court |
-| `POST` | `/api/courts/:id/reviews` | Add review (auth required) |
-| `GET` | `/api/sessions` | List sessions |
-| `POST` | `/api/sessions` | Create session (auth required) |
-| `GET` | `/api/bookings` | User's bookings (auth required) |
-| `POST` | `/api/bookings` | Join a session (auth required) |
+| Method | Endpoint                   | Description                     |
+| ------ | -------------------------- | ------------------------------- |
+| `POST` | `/api/auth/register`       | Create account                  |
+| `POST` | `/api/auth/login`          | Get JWT token                   |
+| `GET`  | `/api/auth/me`             | Current user (auth required)    |
+| `GET`  | `/api/courts`              | Search/list courts              |
+| `GET`  | `/api/courts/:id`          | Court details                   |
+| `GET`  | `/api/courts/:id/sessions` | Sessions for a court            |
+| `GET`  | `/api/courts/:id/reviews`  | Reviews for a court             |
+| `POST` | `/api/courts/:id/reviews`  | Add review (auth required)      |
+| `GET`  | `/api/sessions`            | List sessions                   |
+| `POST` | `/api/sessions`            | Create session (auth required)  |
+| `GET`  | `/api/bookings`            | User's bookings (auth required) |
+| `POST` | `/api/bookings`            | Join a session (auth required)  |
+
+## CI/CD
+
+Pushes and PRs to `main` run the **CI** pipeline (typecheck, tests, build).
+
+Production deploys are triggered by **version tags**:
+
+```bash
+npm run release:patch   # 0.1.0 → 0.1.1 (bug fixes)
+npm run release:minor   # 0.1.0 → 0.2.0 (new features)
+npm run release:major   # 0.1.0 → 1.0.0 (breaking changes)
+```
+
+Each command bumps `package.json` version, creates a `v*` tag, and pushes. The release workflow runs tests, deploys to Vercel, and creates a GitHub Release with a changelog.
 
 ## Architecture
 

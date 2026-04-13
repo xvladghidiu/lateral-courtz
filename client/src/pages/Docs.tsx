@@ -683,16 +683,30 @@ npm test           # All unit tests`}</div>
               <div className={CARD}>
                 <div className={LABEL}>GitHub Actions</div>
                 <p className={`${BODY} mb-3`}>
-                  Every push to <code className="text-white">main</code> and every pull request triggers the CI
-                  pipeline.
+                  Every push to <code className="text-white">main</code> and every pull request triggers the CI pipeline
+                  (typecheck, tests, build). Production deploys are triggered by version tags.
                 </p>
-                <div className={`${CODE_BLOCK} mb-4`}>{`# .github/workflows/ci.yml
-
+                <div className={`${CODE_BLOCK} mb-4`}>{`# .github/workflows/ci.yml      — runs on push/PR to main
 Jobs:
 1. test     — npm ci → typecheck → test → build
-2. deploy   — builds client → deploys to Vercel (main only)`}</div>
 
-                <div className={LABEL}>Test Job</div>
+# .github/workflows/release.yml — runs on v* tags
+Jobs:
+1. test     — npm ci → typecheck → test → build
+2. deploy   — builds client → deploys to Vercel (prebuilt)
+3. release  — creates GitHub Release with changelog`}</div>
+
+                <div className={LABEL}>Releasing</div>
+                <div className={`${CODE_BLOCK} mb-4`}>{`npm run release:patch   # 0.1.0 → 0.1.1 (bug fixes)
+npm run release:minor   # 0.1.0 → 0.2.0 (new features)
+npm run release:major   # 0.1.0 → 1.0.0 (breaking changes)`}</div>
+                <p className={`${BODY} mb-4`}>
+                  Each command bumps the version in <code className="text-white">package.json</code>, creates a{" "}
+                  <code className="text-white">v*</code> git tag, and pushes. The release workflow then runs tests,
+                  deploys to Vercel, and creates a GitHub Release with a changelog generated from commit messages.
+                </p>
+
+                <div className={LABEL}>CI Test Job</div>
                 <ul className="list-none space-y-1.5 mb-4">
                   <li className={`${BODY} flex items-start gap-2`}>
                     <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>Runs on{" "}
@@ -705,7 +719,7 @@ Jobs:
                   </li>
                   <li className={`${BODY} flex items-start gap-2`}>
                     <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>
-                    <code className="text-white">npm test</code> — 60 unit tests (29 server + 31 client)
+                    <code className="text-white">npm test</code> — unit tests (server + client)
                   </li>
                   <li className={`${BODY} flex items-start gap-2`}>
                     <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>
@@ -713,18 +727,22 @@ Jobs:
                   </li>
                 </ul>
 
-                <div className={LABEL}>Deploy Job</div>
+                <div className={LABEL}>Release Deploy Job</div>
                 <ul className="list-none space-y-1.5 mb-4">
                   <li className={`${BODY} flex items-start gap-2`}>
                     <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>Only runs on{" "}
-                    <code className="text-white">main</code> branch pushes (not PRs)
+                    <code className="text-white">v*</code> tag pushes
                   </li>
                   <li className={`${BODY} flex items-start gap-2`}>
                     <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>Requires test job to pass first
                   </li>
                   <li className={`${BODY} flex items-start gap-2`}>
-                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>Builds the client and deploys to
-                    Vercel via <code className="text-white">amondnet/vercel-action</code>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>Builds the client locally and
+                    deploys prebuilt output to Vercel
+                  </li>
+                  <li className={`${BODY} flex items-start gap-2`}>
+                    <span className="text-[#d4a012] text-[10px] mt-1">&#9679;</span>Creates a GitHub Release with
+                    auto-generated changelog
                   </li>
                 </ul>
 
